@@ -12,10 +12,12 @@
 #   public *;
 #}
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# Keep compact source/line metadata so crash stack traces remain diagnosable after R8 optimization.
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# Guard backup payload models and serializers cleanly under R8 full mode.
+-keepclassmembers,allowobfuscation class com.focusforceplus.app.study.backup.** {
+    <fields>;
+    <methods>;
+}

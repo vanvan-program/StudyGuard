@@ -1,52 +1,35 @@
-# Privacy Policy
+# StudyGuard 隐私政策
 
-_Last updated: 2026-07-06_
+更新日期：2026-11-20；适用于 0.3.5-dev。
 
-FocusForce+ is built to keep your data on your device. This policy explains what that means in plain terms.
+StudyGuard 当前离线运行，不申请 `INTERNET` 权限，没有账号、广告、分析、云同步或崩溃上报服务。计划与总结由本机规则生成，未连接在线大模型。
 
-## The short version
+## 本机保存的数据
 
-FocusForce+ collects nothing, sends nothing, and shares nothing. Everything you put into the app stays on your phone. The app has no internet permission, so it has no technical way to transmit your data anywhere. There are no accounts, no cloud sync, no analytics, no crash reporting, and no advertising.
+- 学习目标、科目、计划与任务，以及关联的待办。
+- 学习会话、有效计时分段、自报进度、受限应用访问事件与本地总结。
+- 选择的娱乐应用、学习应用、权限引导状态和其他设置。
+- 原版工具中的例行、普通待办、专注与睡眠配置及相关历史。
 
-## What the app stores, and where
+数据保存在应用内部数据库、DataStore 或本机偏好设置中。卸载应用会删除这些内部数据；用户自行导出的文件不会随卸载自动删除。
 
-All of it lives locally in the app's own storage on your device:
+## 权限用途
 
-- Your routines, to-dos, focus sessions, and app-blocking rules
-- App usage time, used only for the daily limits and the stats shown to you
-- Your settings and preferences
-- A local history of completed routines and focus sessions, for the statistics screen
+- **使用情况访问**：观察前台应用切换和相关时间戳，用于学习时长与受限应用提醒。
+- **无障碍增强（可选）**：观察窗口包名，尝试返回桌面并显示提醒；服务配置不允许读取窗口内容，不读取输入、聊天文本或浏览页面。
+- **通知与前台服务**：显示主动开始的会话、进度检查、待办与例行提醒。
+- **唤醒锁**：运行中的学习监督使用有超时、按需续期的锁维持锁屏观察；暂停、中断、权限丢失及结束时释放。
+- **精确闹钟、勿扰访问及系统闹钟**：供保留的原版待办、例行、专注和睡眠工具按需使用。
+- **应用可见性**：查询有桌面入口的应用等，以提供应用选择和安全放行；未申请查询全部软件包权限。
 
-If you uninstall the app, this data is removed with it (unless you exported a backup yourself).
+StudyGuard 不申请悬浮窗或全屏通知意图权限，不使用 Root、Shizuku 或设备管理权限。用户可撤销授权、强停或卸载；监督不会阻止进入系统设置和通信应用。
 
-## Permissions and why they exist
+## 备份与恢复
 
-Each permission powers one feature and nothing else. You can skip any of them, and the related feature simply stays off.
+应用关闭系统自动备份，并通过备份规则排除云备份及设备转移数据。用户可主动通过系统文档选择器导出学习数据 JSON；恢复会在确认后覆盖学习数据，保留原版普通待办。
 
-- **Notifications**: to show routine alarms and to-do reminders.
-- **Alarms and reminders (exact alarms)**: so reminders fire on time.
-- **Display over other apps**: so an alarm screen can appear over whatever you're doing.
-- **Accessibility service**: to detect which app you just opened, so a blocked app can be covered. It cannot and does not read your screen content. This is switched off in the service configuration.
-- **Usage access**: to measure how long you used an app, for daily time limits and the screen-time numbers you see.
-- **Do Not Disturb access**: so a focus session can silence interruptions and turn that back off when it ends.
-- **Battery (unrestricted)**: optional, so reminders stay reliable on aggressive battery savers.
+导出的 JSON 未加密，可能包含任务内容、进度和历史，请自行保管。如选用云盘等文档提供方，该提供方可能按自己的政策同步文件；StudyGuard 自身不上传这些文件。原版工具的独立备份不包含新增的学习数据表。
 
-None of this information leaves your device.
+## 反馈与变更
 
-## Backups
-
-Android may include the app in a device backup you have enabled in your system settings. That backup is handled by Google and your device, not by FocusForce+, and follows your own backup settings. The app's setup state is excluded from backup on purpose, so a fresh install always walks you through setup again.
-
-You can also export all your data to a plain JSON file yourself, from Settings. That file goes wherever you choose to save it, and it's your responsibility from that point on.
-
-## Children
-
-FocusForce+ is not directed at children and collects no data from anyone.
-
-## Changes
-
-If this policy ever changes, the updated version will be posted here with a new date at the top.
-
-## Contact
-
-Questions or concerns: open an issue at https://github.com/karOS555/FocusForcePlus/issues
+本政策会随实际功能更新。反馈时请先移除备份、截图和日志中的个人信息。一般问题可提交至 [StudyGuard Issues](https://github.com/vanvan-program/StudyGuard/issues)，安全问题见 [安全政策](SECURITY.md)。

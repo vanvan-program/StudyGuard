@@ -1,250 +1,66 @@
-<div align="center"><a href="https://github.com/Safouene1/support-palestine-banner/blob/master/Markdown-pages/Support.md"><img src="https://raw.githubusercontent.com/Safouene1/support-palestine-banner/master/banner-support.svg" alt="Support Palestine" width="100%"></a></div>
+# StudyGuard
 
-<br/>
-<br/>
+面向自主学习的 Android 应用：把学习任务、专注计时、应用使用提醒和学习统计放在一起。支持纸书与手机学习模式，数据默认保存在本机，无账号、无广告、不申请联网权限。
 
-<div align="center">
+**[下载安装包](https://github.com/vanvan-program/StudyGuard/releases/tag/v0.3.5-dev)** · [使用指南](docs/studyguard/使用与安装指南.md) · [验证结果](docs/studyguard/VALIDATION-0.3.5-dev.md) · [问题反馈](https://github.com/vanvan-program/StudyGuard/issues)
 
-<img src="docs/logo.png" alt="FocusForce+" width="140"/>
+当前版本 **0.3.5-dev**，支持 Android 8.0 及以上。当前为开发预览版：计划与总结使用本地规则，尚未接入在线大模型；已在 Android 16 官方模拟器验证本次任务修复，厂商真机与长期后台运行仍待验证。
 
-# FocusForce+
+## 可以做什么
 
-### Routines, to-dos, app blocking, focus and sleep mode in one app, with reminders that are hard to ignore.
+- **学习计时**：手动开始、暂停和恢复；纸书模式允许锁屏，手机模式只累计本应用及所选学习应用中的时间。
+- **计划与任务**：创建、编辑、改期和完成任务；生成未来最多 7 天的本地规则草案，通过日历选择日期。
+- **任务关联**：从任务开始学习，达到目标时自动完成；提前结束可选择同时完成任务；应用进程中断后仍保留关联任务。
+- **减少分心**：自主选择受限娱乐应用与学习白名单。基础模式监测并提醒，可自愿开启无障碍增强；始终放行通信、桌面、系统设置与卸载。
+- **进度与统计**：按有效学习时间触发进度检查，查看科目时长、近 7/30 日趋势、打卡与本地日总结。
+- **数据备份**：在设置中导出学习数据为 JSON，确认后覆盖恢复；校验备份格式、关联关系和校验和。
+- **随时退出**：提前结束无需填写原因，紧急解除无需密码或等待。
 
-<br/>
+计时以可确认的观察区间为准。进程中断、长观测缺口和明显时钟跳变不会补计未知时间；记录时长不能证明认真学习。普通应用的应用限制能力受系统约束。
 
-[![License](https://img.shields.io/badge/license-GPLv3-1d4ed8?style=flat-square)](LICENSE)
-[![Platform](https://img.shields.io/badge/Android_8%2B-152e54?style=flat-square&logo=android&logoColor=white)]()
-[![Kotlin](https://img.shields.io/badge/Kotlin-152e54?style=flat-square&logo=kotlin&logoColor=white)]()
-[![Compose](https://img.shields.io/badge/Jetpack_Compose-1a3a6b?style=flat-square&logo=jetpackcompose&logoColor=white)]()
-[![Local only](https://img.shields.io/badge/100%25_offline-050508?style=flat-square)]()
-[![Website](https://img.shields.io/badge/Website-0f2847?style=flat-square&logo=githubpages&logoColor=white)](https://karos555.github.io/FocusForcePlus/)
+## 安装与更新
 
-<br/>
+在 [Releases](https://github.com/vanvan-program/StudyGuard/releases) 下载 `StudyGuard-0.3.5-dev-release.apk`，用手机文件管理器打开并按系统提示安装。`debug` 和 `androidTest` 包面向开发测试，日常试用选 `release`。
 
-<a href="https://github.com/karOS555/FocusForcePlus/releases/latest">
-<img src="https://img.shields.io/badge/Download_the_APK-1d4ed8?style=for-the-badge&logo=android&logoColor=white" alt="Download the APK"/>
-</a>
+包名为 `io.studyguard.app`，不会覆盖上游 FocusForcePlus。本版沿用已有 StudyGuard 开发证书，可覆盖同签名旧开发版；证书及安装包校验值见验证报告和 Release 附件中的 `SHA256SUMS.txt`。自行构建的包通常签名不同，更新前请先保存备份。
 
-<!-- Enable once FocusForce+ is listed on IzzyOnDroid. Check both URLs against the
-     current IzzyOnDroid docs before turning this on.
-<a href="https://apt.izzysoft.de/fdroid/index/apk/com.focusforceplus.app">
-<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" alt="Get it on IzzyOnDroid" height="60"/>
-</a>
--->
+## 权限与数据
 
-<sub>No Play Store needed. Grab the latest APK and install it directly. [How to install](#install)</sub>
+使用情况访问用于识别前台应用及计时；通知用于显示运行状态和提醒；可选无障碍服务仅读取窗口包名，不读取文字、输入和页面内容。原版工具保留可选的精确闹钟与勿扰访问。权限按需开启，可随时撤销。
 
-</div>
+应用未声明 `INTERNET`，不接入云服务或分析 SDK，系统云备份和设备转移排除应用数据。用户主动导出的 JSON **未加密**；如保存到云盘，文件可能由所选文档提供方同步。卸载会删除应用内部数据。详细说明见 [隐私政策](PRIVACY.md)。
 
-<br/>
+## 从源码构建
 
-> [!NOTE]
-> FocusForce+ is in public beta. Everything is built and it runs on real devices, but it hasn't had a wide test yet, so expect the odd rough edge. If you hit one, please [open an issue](../../issues), it really helps.
+使用 **JDK 21**、Android SDK Platform **36.1** 和项目自带 Gradle Wrapper；Android Studio 打开仓库根目录即可。首次同步需要下载依赖。工程使用 Gradle 9.3.1、AGP 9.1.1、Kotlin 2.2.10，minSdk 26、targetSdk 36。
 
-<br/>
+```sh
+git clone https://github.com/vanvan-program/StudyGuard.git
+cd StudyGuard
+./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug --max-workers=1
+```
 
-<p align="center">
-<img src="fastlane/metadata/android/en-US/images/featureGraphic.png" width="100%" alt="Routines, to-dos, app blocking and focus in one fully offline app">
-</p>
+Windows 可使用 `gradlew.bat`，或现有 `scripts/Build-StudyGuard.ps1`。必要时通过本机 `local.properties` 配置 SDK 路径，该文件不提交。Windows 中文路径编码说明见 [BUILD-ENCODING.md](docs/studyguard/BUILD-ENCODING.md)。
 
-<h2 id="what-it-is"><sub><img src="docs/readme/icons/info.svg" height="24" width="24" alt=""></sub> What it is</h2>
+Release 构建启用 R8 和资源收缩。自行签名时设置 `KEYSTORE_FILE`、`KEYSTORE_PASSWORD`、`KEY_ALIAS`、`KEY_PASSWORD`；没有签名配置和本地兼容密钥时生成未签名 Release。仓库不含私钥。GitHub 的手动构建流程只生成 Debug 测试包，不自动发布 Release。
 
-FocusForce+ puts five things that usually live in five separate apps into one: strict **routines**, a nagging **to-do planner**, an **app blocker**, a **focus mode**, and a **sleep mode**. The whole point is that it doesn't let you wriggle out of your own plans the second motivation dips.
+## 当前验证结果
 
-It's aimed at people whose brains need more structure than most apps assume: ADHD, trouble reining in your own habits, or just losing too many hours to your phone. Everything stays on your phone: no account, no cloud, no ads, no tracking.
+2026-11-20 对本次任务关联修复的验证：
 
-I built it for myself first, and I use it every day. Nothing I tried before held up once the motivation was gone. Putting it on GitHub came later, but if your brain works anything like mine, it might fit you too.
+| 项目 | 结果 |
+| --- | --- |
+| JVM 单元测试 | 182 项通过，0 失败、0 错误、0 跳过 |
+| Android 16 `StudyPersistenceTest` | 17 项通过 |
+| Release 实际操作 | 提前结束完成任务、强停恢复关联、恢复后达到目标自动完成均通过 |
+| 数据升级 | Room 10→12、11→12 及 0.3.4→0.3.5 数据保留验证通过 |
+| 构建 | Debug、AndroidTest 与 R8 Release 成功 |
+| Lint Debug | 0 errors、31 warnings、10 hints |
 
-<h2 id="screenshots"><sub><img src="docs/readme/icons/smartphone.svg" height="24" width="24" alt=""></sub> Screenshots</h2>
+详细证据见 [验证报告](docs/studyguard/VALIDATION-0.3.5-dev.md)。本次未宣称全部设备用例通过：之前识别的两处日历测试定位/断言问题仍待处理，厂商真机、长期后台和耗电未验收。
 
-<p align="center">
-<a href="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="30%" alt="Your day at a glance"></a>
-&nbsp;
-<a href="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="30%" alt="Routines, step by step"></a>
-&nbsp;
-<a href="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="30%" alt="Nothing quietly disappears"></a>
-</p>
+## 来源与许可证
 
-<p align="center">
-<a href="fastlane/metadata/android/en-US/images/phoneScreenshots/4.png"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" width="30%" alt="Block what pulls you in"></a>
-&nbsp;
-<a href="fastlane/metadata/android/en-US/images/phoneScreenshots/5.png"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/5.png" width="30%" alt="The block holds"></a>
-&nbsp;
-<a href="fastlane/metadata/android/en-US/images/phoneScreenshots/6.png"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/6.png" width="30%" alt="Wind down, wake up"></a>
-</p>
+本项目基于 [karOS555/FocusForcePlus](https://github.com/karOS555/FocusForcePlus) 二次开发，固定上游提交 [`f2987bc61d98bf8db42304929ed38bcba8090838`](https://github.com/karOS555/FocusForcePlus/commit/f2987bc61d98bf8db42304929ed38bcba8090838)，保留上游版权及 GPLv3 [LICENSE](LICENSE)。原始说明保存在 [UPSTREAM_README.md](UPSTREAM_README.md)。
 
-<h2 id="whats-inside"><sub><img src="docs/readme/icons/layers.svg" height="24" width="24" alt=""></sub> What's inside</h2>
-
-- **Routines** — a real alarm at the start time and a countdown for every step
-- **To-dos** — a planner that won't let things quietly slip
-- **App blocker** — daily limits, time windows and app groups
-- **Focus mode** — one timed session with Do Not Disturb and blocked apps
-- **Sleep mode** — one nightly schedule, from wind-down to wake-up
-- **Dashboard and statistics** — your day at a glance, plus a weekly view
-
-<details>
-<summary><b>The details</b></summary>
-
-<br/>
-
-**Routines.** Multi-step routines with a real alarm at the start time, a countdown for every step, and a heads-up before each one ends. Run over time and the timer keeps going into the negative and keeps reminding you.
-
-**To-dos.** A planner that won't let things quietly slip. Timed to-dos alarm you like a routine does. Loose ones resurface a few times a day. Overdue ones stay pinned until you deal with them.
-
-**App blocker.** Block distracting apps by a daily time limit, a fixed time window (overnight works too), or automatically during routines and focus sessions. Bundle apps into groups that share one limit, one blocking schedule, and one set of rules.
-
-**Focus mode.** One session that turns on Do Not Disturb, silences notifications, and blocks the apps or groups you pick, for a set stretch of time. Start one on the spot or schedule it.
-
-**Sleep mode.** One nightly schedule: a wind-down reminder, Do Not Disturb, and your distracting apps out of reach until morning. Bedtime and wake-up can each kick off a routine, and it can put backup alarms in your phone's own clock app so waking up never depends on this one.
-
-**Home dashboard.** Your day at a glance: today's routines and their status, the to-dos that need you next, screen time, and quick actions.
-
-**Statistics.** A simple weekly view of routines completed and focus minutes logged.
-
-</details>
-
-<h2 id="what-makes-it-different"><sub><img src="docs/readme/icons/sparkles.svg" height="24" width="24" alt=""></sub> What makes it different</h2>
-
-**Invincible Mode is per feature, not one big switch.**
-Most blocking apps give you a single lockdown toggle; here you turn it on for the individual routine, session or rule you want to commit to. While it's active you can't cancel or weaken that one thing until it reaches its natural end.
-
-**It's friction, not a trap.**
-You can always uninstall the app from Android settings, and a factory reset always works. The point is to make bypassing annoying enough that a bad-day version of you doesn't do it for a dumb reason.
-
-**Tamper Protection for the settings themselves.**
-Optional second layer: loosening your own lock settings only works inside a short daily window you choose.
-
-**Actually local.**
-No internet permission at all, so your data has no way to leave the device. Everything exports and imports as a plain JSON file.
-
-<h2 id="install"><sub><img src="docs/readme/icons/download.svg" height="24" width="24" alt=""></sub> Install</h2>
-
-1. Open [the latest release](https://github.com/karOS555/FocusForcePlus/releases/latest) and download the `.apk` file.
-2. Open it on your phone. Android will ask permission to install from this source the first time. Allow it.
-3. Follow the in-app setup guide. It walks you through the permissions each feature needs and explains what every one is for.
-
-Minimum Android version is 8.0 (API 26).
-
-> [!IMPORTANT]
-> Some permissions (accessibility for app blocking, usage access for time limits, Do Not Disturb for focus mode) are granted in Android's own settings. The setup guide takes you there and tells you exactly what each one does and doesn't do. Nothing is turned on behind your back.
-
-### Getting updates
-
-The app can't check for updates itself, that's the point. Either use **Settings > About > Check for updates**, which opens the releases page, or let [Obtainium](https://github.com/ImranR98/Obtainium) watch this repo and update the APK for you.
-
-<div align="center">
-
-<a href="https://github.com/ImranR98/Obtainium">
-<img src="https://img.shields.io/badge/Get_updates_via-Obtainium-1a3a6b?style=for-the-badge&logoColor=white" alt="Get updates via Obtainium"/>
-</a>
-
-</div>
-
-> [!TIP]
-> Install Obtainium, then add `https://github.com/karOS555/FocusForcePlus` as a source.
-
----
-
-<details>
-<summary><sub><img src="docs/readme/icons/wrench.svg" height="18" width="18" alt=""></sub> <b>Tech stack</b></summary>
-
-<br/>
-
-| | |
-|---|---|
-| Language | Kotlin |
-| UI | Jetpack Compose, Material 3 |
-| Architecture | MVVM, Clean Architecture |
-| Database | Room (local SQLite) |
-| DI | Hilt |
-| Background work | WorkManager, foreground services |
-| Reminders | AlarmManager, NotificationCompat |
-| App blocking | AccessibilityService, UsageStatsManager |
-| Min SDK | 26 (Android 8.0) |
-
-</details>
-
-<details>
-<summary><sub><img src="docs/readme/icons/milestone.svg" height="18" width="18" alt=""></sub> <b>Project status and roadmap</b></summary>
-
-<br/>
-
-The whole app is built and the first public beta is out. From here it's real-device testing, polish based on feedback, and eventually a Play Store submission.
-
-- [x] Project foundation (Room, Hilt, navigation, dark theme)
-- [x] Routines with timers, snooze logic, and Invincible Mode
-- [x] To-do planner with the persistent reminder system
-- [x] App blocker via AccessibilityService, with groups and time limits
-- [x] Focus mode with Do Not Disturb
-- [x] Onboarding and settings
-- [x] Home dashboard and statistics
-- [x] Tamper Protection, JSON backup, quick-settings tile
-- [x] First public beta
-- [x] Sleep mode with linked routines and backup alarms
-- [ ] Stable 1.0 after a testing round
-- [ ] Play Store submission
-
-Later ideas: home-screen widgets, calendar sync, a Pomodoro mode, streaks and gamification.
-
-</details>
-
-<details>
-<summary><sub><img src="docs/readme/icons/lock-keyhole.svg" height="18" width="18" alt=""></sub> <b>Privacy</b></summary>
-
-<br/>
-
-Everything runs on your device. The app collects nothing, sends nothing, and has no analytics, crash reporting, or ad SDKs. It has no internet permission.
-
-Permissions are used only for the feature they belong to: accessibility to see which app you opened (so it can be blocked, it never reads screen content), usage access to measure app time for limits, Do Not Disturb access for focus sessions, alarms and notifications for reminders.
-
-Full details are in [PRIVACY.md](PRIVACY.md).
-
-</details>
-
-<details>
-<summary><sub><img src="docs/readme/icons/git-pull-request.svg" height="18" width="18" alt=""></sub> <b>Contributing</b></summary>
-
-<br/>
-
-Bug reports, ideas, and pull requests are all welcome, especially notes on how the app behaves on your device during the beta. See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get set up and the few ground rules the project sticks to.
-
-</details>
-
-<details>
-<summary><sub><img src="docs/readme/icons/users.svg" height="18" width="18" alt=""></sub> <b>Credits</b></summary>
-
-<br/>
-
-The code is written from scratch in Kotlin, but the ideas and some of the architecture lean on a few great open projects:
-
-- [Mindful](https://github.com/akaMrNagar/Mindful) by akaMrNagar, for the app-blocking and invincible-mode concepts
-- [MindMaster](https://github.com/ArmanKhanTech/MindMaster) by ArmanKhanTech, for blocking modes and Kotlin patterns
-- [Curbox / DigiPaws](https://github.com/nethical6/digipaws) by nethical6, for gamified blocking ideas
-- [Routinery](https://play.google.com/store/apps/details?id=com.routinery.routinery), for routine-execution UX
-
-Icons in this README are from [Lucide](https://github.com/lucide-icons/lucide), used under the ISC License.
-
-</details>
-
----
-
-<h2 id="license"><sub><img src="docs/readme/icons/scale.svg" height="24" width="24" alt=""></sub> License</h2>
-
-GNU General Public License v3.0, see [LICENSE](LICENSE). Anything built on top has to stay open under the same license, with the original credit kept.
-
-<h2 id="a-note-on-health"><sub><img src="docs/readme/icons/heart-pulse.svg" height="24" width="24" alt=""></sub> A note on health</h2>
-
-FocusForce+ is a self-help tool for building focus and habits. It is not a medical device and does not diagnose, treat, cure, or prevent ADHD or any other condition, and it is not a substitute for professional care. If you're struggling, please talk to a qualified healthcare professional.
-
-<h2 id="if-it-helps-you"><sub><img src="docs/readme/icons/star.svg" height="24" width="24" alt=""></sub> If it helps you</h2>
-
-The app collects nothing and never phones home, which means I have no idea whether anyone is actually using it. So if it's doing something for you, a ⭐ on the repo or an [issue](../../issues) is the only signal I get — bugs, rough edges, ideas, or just a line saying it works.
-
-<div align="right"><table><td><a href="#start-of-content">↥ Scroll to top</a></td></table></div>
-
----
-
-<div align="center">
-<sub>Built with care for minds that need a little extra structure.</sub>
-</div>
+StudyGuard 的修改记录见 [CHANGES_STUDYGUARD.md](CHANGES_STUDYGUARD.md)，第三方归属与依赖许可证证据见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。上游历史网站与商店素材保留作为来源参考，见 [文档说明](docs/README.md)。

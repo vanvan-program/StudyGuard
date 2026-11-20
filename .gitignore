@@ -1,5 +1,6 @@
 # Build output
 .gradle/
+.kotlin/
 /build
 /captures
 /app/build/
@@ -9,6 +10,12 @@
 
 # Local config (machine-specific)
 /local.properties
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+*.log
 
 # IDE (Android Studio / IntelliJ) - machine-specific, keep out of the repo
 .idea/

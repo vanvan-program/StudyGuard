@@ -21,6 +21,13 @@ import com.focusforceplus.app.data.db.entity.RoutineCompletionEntity
 import com.focusforceplus.app.data.db.entity.RoutineEntity
 import com.focusforceplus.app.data.db.entity.RoutineTaskEntity
 import com.focusforceplus.app.data.db.entity.TodoEntity
+import com.focusforceplus.app.study.data.StudyDao
+import com.focusforceplus.app.study.data.StudyEvent
+import com.focusforceplus.app.study.data.StudyProfile
+import com.focusforceplus.app.study.data.StudySegment
+import com.focusforceplus.app.study.data.StudySession
+import com.focusforceplus.app.study.data.StudySummary
+import com.focusforceplus.app.study.data.StudyTask
 
 @Database(
     entities = [
@@ -32,12 +39,19 @@ import com.focusforceplus.app.data.db.entity.TodoEntity
         FocusSessionEntity::class,
         RoutineCompletionEntity::class,
         FocusCompletionEntity::class,
+        StudyProfile::class,
+        StudyTask::class,
+        StudySession::class,
+        StudySegment::class,
+        StudyEvent::class,
+        StudySummary::class,
     ],
-    version = 10,
+    version = 12,
     exportSchema = true,
 )
 @TypeConverters(AppTypeConverters::class)
 abstract class AppDatabase : RoomDatabase() {
+    abstract fun studyDao(): StudyDao
     abstract fun routineDao(): RoutineDao
     abstract fun routineTaskDao(): RoutineTaskDao
     abstract fun todoDao(): TodoDao

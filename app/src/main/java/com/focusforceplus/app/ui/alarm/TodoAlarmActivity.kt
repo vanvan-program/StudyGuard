@@ -185,16 +185,14 @@ class TodoAlarmActivity : ComponentActivity() {
             val uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
                 ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val attrs = AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_ALARM)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .build()
-                val req = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
-                    .setAudioAttributes(attrs).build()
-                audioFocusRequest = req
-                audioManager.requestAudioFocus(req)
-            }
+            val attrs = AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_ALARM)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build()
+            val req = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+                .setAudioAttributes(attrs).build()
+            audioFocusRequest = req
+            audioManager.requestAudioFocus(req)
 
             ringtone = RingtoneManager.getRingtone(this, uri)?.also {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) it.isLooping = true
@@ -206,10 +204,8 @@ class TodoAlarmActivity : ComponentActivity() {
     private fun stopAlarmSound() {
         try {
             ringtone?.stop(); ringtone = null
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                audioFocusRequest?.let {
-                    (getSystemService(AUDIO_SERVICE) as AudioManager).abandonAudioFocusRequest(it)
-                }
+            audioFocusRequest?.let {
+                (getSystemService(AUDIO_SERVICE) as AudioManager).abandonAudioFocusRequest(it)
             }
         } catch (_: Exception) {}
     }

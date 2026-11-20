@@ -28,14 +28,12 @@ If it helps show the problem, add them here.
 
 - **Device:** e.g. Pixel 7, Samsung Galaxy S22
 - **Android version:** e.g. Android 14
-- **App version:** e.g. 0.9.1-beta (shown in Settings > About)
+- **App version:** e.g. 0.3.5-dev (shown in Settings)
 
 ## Permissions you granted
 
 - [ ] Notifications
 - [ ] Exact alarms
-- [ ] Display over other apps
-- [ ] Full-screen alarms
 - [ ] Accessibility service
 - [ ] Usage access
 - [ ] Do Not Disturb access
@@ -43,7 +41,7 @@ If it helps show the problem, add them here.
 
 ## Logs (optional)
 
-If you have adb set up: `adb logcat | grep -i focusforce`
+If you have adb set up, include relevant StudyGuard logs after removing personal information.
 
 ```
 paste logs here

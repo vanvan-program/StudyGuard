@@ -1,10 +1,5 @@
 <resources>
-    <string name="app_name">FocusForce+</string>
-    <string name="accessibility_service_label">FocusForce+ App Blocker</string>
-    <string name="accessibility_service_description">FocusForce+ uses this accessibility
-        service for exactly one purpose: detecting which app you open, so that apps you
-        chose to block can be covered with a blocking screen. The service cannot read any
-        screen content (window content access is disabled), collects no data, and nothing
-        ever leaves your device. You can turn this service off here at any time — your
-        blocking rules stay saved and blocking simply pauses.</string>
+    <string name="app_name">StudyGuard</string>
+    <string name="accessibility_service_label">StudyGuard 学习拦截（可选）</string>
+    <string name="accessibility_service_description">仅在用户手动学习会话期间，观察所选受限应用的窗口包名，尝试返回桌面并显示学习提醒。不读取窗口内容、文字、输入或浏览器页面，不联网。应用访问与学习记录保存在本机。可随时撤销；提前或紧急退出会解除本次限制。不阻止系统设置、通信或卸载，拦截可能受系统与厂商限制。</string>
 </resources>

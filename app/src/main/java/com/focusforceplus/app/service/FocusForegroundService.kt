@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
+import android.os.SystemClock
 import com.focusforceplus.app.data.db.entity.FocusCompletionEntity
 import com.focusforceplus.app.data.repository.FocusRepository
 import com.focusforceplus.app.util.FocusNotificationHelper
@@ -47,6 +48,8 @@ class FocusForegroundService : Service() {
     private var sessionType: String = "CUSTOM"
     private var totalSeconds: Int = 0
     private var remainingSeconds: Int = 0
+    private var remainingMillis: Long = 0
+    private var previousTickElapsed: Long = 0
     private var invincible: Boolean = false
     private var blocksApps: Boolean = false
     private var blockedGroups: Set<String>? = null
@@ -63,7 +66,8 @@ class FocusForegroundService : Service() {
                 sessionType = intent.getStringExtra(EXTRA_SESSION_TYPE) ?: "CUSTOM"
                 totalSeconds = intent.getIntExtra(EXTRA_DURATION_MINUTES, 25) * 60
                 remainingSeconds = totalSeconds
-                invincible = intent.getBooleanExtra(EXTRA_INVINCIBLE, false)
+                remainingMillis = totalSeconds * 1_000L
+                invincible = false
                 blocksApps = intent.getBooleanExtra(EXTRA_BLOCKS_APPS, false)
                 blockedGroups = intent.getStringExtra(EXTRA_BLOCKED_GROUPS)
                     ?.split(',')
@@ -81,7 +85,7 @@ class FocusForegroundService : Service() {
                 startForegroundWithNotification()
                 startTicker()
             }
-            ACTION_PAUSE -> if (!invincible && !paused) {
+            ACTION_PAUSE -> if (!paused) {
                 paused = true
                 tickerJob?.cancel()
                 publishRegistry()
@@ -94,8 +98,7 @@ class FocusForegroundService : Service() {
                 startTicker()
             }
             ACTION_END -> {
-                // Invincible sessions have no early exit — the timer is the natural end.
-                if (!invincible) finishSession(completed = false)
+                finishSession(completed = false)
             }
         }
         return START_NOT_STICKY
@@ -103,10 +106,19 @@ class FocusForegroundService : Service() {
 
     private fun startTicker() {
         tickerJob?.cancel()
+        previousTickElapsed = SystemClock.elapsedRealtime()
         tickerJob = serviceScope.launch {
             while (remainingSeconds > 0) {
                 delay(1_000L)
-                remainingSeconds--
+                val now = SystemClock.elapsedRealtime()
+                val delta = now - previousTickElapsed
+                previousTickElapsed = now
+                if (delta !in 0..5_000) {
+                    finishSession(completed = false)
+                    return@launch
+                }
+                remainingMillis = (remainingMillis - delta).coerceAtLeast(0)
+                remainingSeconds = ((remainingMillis + 999) / 1_000).toInt()
                 // The countdown itself renders via the system chronometer; the
                 // 15-second re-post is what advances the timeline tracker and the
                 // Live Update chip.
@@ -207,7 +219,6 @@ class FocusForegroundService : Service() {
         historyRecorded = true
         val focusedMinutes = if (completed) totalSeconds / 60
                              else (totalSeconds - remainingSeconds) / 60
-        if (!completed && focusedMinutes < 1) return
         val entry = FocusCompletionEntity(
             sessionId = sessionId,
             name = sessionName,

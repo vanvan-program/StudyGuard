@@ -4,7 +4,6 @@
 
     <!-- ── Notification & alarm permissions ──────────────────────────────── -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
 
     <!-- Android 16+: lets the running routine / focus / sleep notification be
          promoted to a Live Update — status bar chip, lock screen, always-on
@@ -15,10 +14,8 @@
 
     <!-- Required for startActivity() to work when another app is in the foreground.
          All alarm apps (Alarmy, Sleep as Android, etc.) need this. -->
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <!-- Android 13+: automatically granted, enables setExactAndAllowWhileIdle() for pre-alarms. -->
-    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
     <!-- Android 12: user must grant this manually; we prompt in MainActivity if needed.
          setAlarmClock() is always exempt regardless of this permission. -->
@@ -32,6 +29,7 @@
          declaration for specialUse; the subtype values below are written for it. -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <!-- Boot receiver -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -65,6 +63,15 @@
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.HOME" />
         </intent>
+        <intent>
+            <action android:name="android.intent.action.DIAL" />
+        </intent>
+        <intent>
+            <action android:name="android.settings.SETTINGS" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.SHOW_ALARMS" />
+        </intent>
         <!-- Lets us check whether this device actually ships the per-app
              full-screen-notification screen before sending the user there.
              Several OEMs (Samsung One UI) do not — see PermissionHelper. -->
@@ -82,12 +89,12 @@
 
     <application
         android:name=".FocusForcePlusApp"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_studyguard"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/ic_studyguard"
         android:supportsRtl="true"
         android:theme="@style/Theme.FocusForce">
 
@@ -114,17 +121,36 @@
         <!-- Main activity — also the target for alarm full-screen intents -->
         <activity
             android:name=".MainActivity"
-            android:exported="true"
+            android:exported="false"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:showOnLockScreen="true"
             android:turnScreenOn="true"
-            android:theme="@style/Theme.FocusForce.Splash">
+            android:theme="@style/Theme.FocusForce.Splash" />
+        <activity
+            android:name=".study.ui.StudyGuardActivity"
+            android:exported="true"
+            android:theme="@style/Theme.FocusForce">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".study.ui.StudyBlockedActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.FocusForce" />
+        <service
+            android:name=".study.monitor.StudyMonitorService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="User-initiated study session: continuously observes foreground package changes, maintains an accurate local study ledger, and provides progress and emergency-stop notifications until the user ends the session." />
+        </service>
+        <receiver android:name=".study.monitor.StudyStopReceiver" android:exported="false" />
 
         <!-- Short-lived service that starts RoutineAlarmActivity from background -->
         <service

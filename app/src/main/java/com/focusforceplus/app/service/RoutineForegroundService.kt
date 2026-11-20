@@ -100,7 +100,7 @@ class RoutineForegroundService : Service() {
             ACTION_CANCEL -> {
                 // Invincible sessions have no early exit (defense in depth — the UI
                 // already hides the cancel affordances).
-                if (!invincible) endSession()
+                endSession()
             }
             ACTION_TASK_END_CHECK -> {
                 if (routineId == 0L) {
@@ -127,7 +127,7 @@ class RoutineForegroundService : Service() {
             val loadedTasks = repository.getTasksForRoutine(id).first()
             if (routine == null || loadedTasks.isEmpty()) { stopSelf(); return@launch }
             routineName = routine.name
-            invincible = routine.invincibleMode
+            invincible = false
             blocksApps = routine.appBlockerEnabled
             tasks = loadedTasks
             activeRoutineRegistry.markActive(id, blocksApps, invincible)
@@ -151,7 +151,7 @@ class RoutineForegroundService : Service() {
             }
             routineId = snapshot.routineId
             routineName = routine.name
-            invincible = routine.invincibleMode
+            invincible = false
             blocksApps = routine.appBlockerEnabled
             tasks = loadedTasks
             taskIndex = snapshot.taskIndex

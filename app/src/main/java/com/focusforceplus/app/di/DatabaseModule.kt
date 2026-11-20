@@ -40,6 +40,8 @@ object DatabaseModule {
             AppDatabase.MIGRATION_7_8,
             AppDatabase.MIGRATION_8_9,
             AppDatabase.MIGRATION_9_10,
+            com.focusforceplus.app.study.data.StudyMigration,
+            com.focusforceplus.app.study.data.StudyTaskLinkMigration,
         )
         .build()
 

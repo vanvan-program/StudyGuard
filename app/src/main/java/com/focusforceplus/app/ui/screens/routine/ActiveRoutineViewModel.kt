@@ -130,7 +130,7 @@ class ActiveRoutineViewModel @Inject constructor(
                     tasks = tasks,
                     maxSnoozeCount = routine.maxSnoozeCount,
                     maxRescheduleCount = routine.maxRescheduleCount,
-                    invincibleMode = routine.invincibleMode,
+                    invincibleMode = false,
                     appBlockerEnabled = routine.appBlockerEnabled,
                     remainingSeconds = totalSec,
                     taskTotalSeconds = totalSec,
@@ -272,7 +272,7 @@ class ActiveRoutineViewModel @Inject constructor(
                         triggerMillis  = triggerAt,
                         snoozeCount    = 0,
                         maxSnoozeCount = routine.maxSnoozeCount,
-                        invincibleMode = routine.invincibleMode,
+                        invincibleMode = false,
                     ),
                 )
             } catch (_: Exception) {}

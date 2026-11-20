@@ -1,0 +1,665 @@
+{
+    "format": "StudyGuardBackup",
+    "formatVersion": 1,
+    "exportedWall": 1795185564210,
+    "appVersion": "0.3.4-dev",
+    "payload": {
+        "schemaVersion": 11,
+        "profile": {
+            "id": 1,
+            "goal": "",
+            "subjects": "",
+            "examDay": "2026-12-20",
+            "dailyMinutes": 120,
+            "progressPercent": 0,
+            "checkMinutes": 30,
+            "blockedPackages": "com.android.chrome",
+            "allowedPackages": ""
+        },
+        "todos": [
+            {
+                "id": 1,
+                "title": "QAReviewTask",
+                "description": "StudyGuard · QAReviewMath · 30 分钟 · MANUAL",
+                "dueDateTime": null,
+                "priority": 1,
+                "isCompleted": false,
+                "isRecurring": false,
+                "recurringPattern": null,
+                "snoozeCount": 0,
+                "maxSnoozeCount": 2,
+                "rescheduleCount": 0,
+                "maxRescheduleCount": 1,
+                "createdAt": 1795184255884,
+                "completedAt": null,
+                "postponedTo": null,
+                "checklistJson": null
+            }
+        ],
+        "tasks": [
+            {
+                "id": 1,
+                "todoId": 1,
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "plannedMinutes": 30,
+                "source": "MANUAL"
+            }
+        ],
+        "sessions": [
+            {
+                "id": "81304395-4f33-4960-bd5f-2a74ee4670ad",
+                "subject": "QAReviewMath",
+                "mode": "PAPER",
+                "targetMs": 1800000,
+                "state": "EARLY_END",
+                "startedWall": 1795184901962,
+                "lastWall": 1795184976819,
+                "lastElapsed": 1376211,
+                "effectiveMs": 74698,
+                "endedWall": 1795184977883,
+                "endReason": "",
+                "blockedPackages": "",
+                "allowedPackages": "",
+                "checkMinutes": 30,
+                "lastCheckEffectiveMs": 0
+            },
+            {
+                "id": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "mode": "PAPER",
+                "targetMs": 1800000,
+                "state": "EMERGENCY_END",
+                "startedWall": 1795185213366,
+                "lastWall": 1795185509037,
+                "lastElapsed": 1908420,
+                "effectiveMs": 177324,
+                "endedWall": 1795185509195,
+                "endReason": "拦截页面紧急退出",
+                "blockedPackages": "com.android.chrome",
+                "allowedPackages": "",
+                "checkMinutes": 30,
+                "lastCheckEffectiveMs": 0
+            }
+        ],
+        "segments": [
+            {
+                "id": 1,
+                "sessionId": "81304395-4f33-4960-bd5f-2a74ee4670ad",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795184901962,
+                "durationMs": 2083,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 2,
+                "sessionId": "81304395-4f33-4960-bd5f-2a74ee4670ad",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795184904063,
+                "durationMs": 2011,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 3,
+                "sessionId": "81304395-4f33-4960-bd5f-2a74ee4670ad",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795184906085,
+                "durationMs": 4018,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 4,
+                "sessionId": "81304395-4f33-4960-bd5f-2a74ee4670ad",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795184910105,
+                "durationMs": 4068,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 5,
+                "sessionId": "81304395-4f33-4960-bd5f-2a74ee4670ad",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795184914176,
+                "durationMs": 4024,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 6,
+                "sessionId": "81304395-4f33-4960-bd5f-2a74ee4670ad",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795184918202,
+                "durationMs": 4021,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 7,
+                "sessionId": "81304395-4f33-4960-bd5f-2a74ee4670ad",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795184922224,
+                "durationMs": 6051,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 8,
+                "sessionId": "81304395-4f33-4960-bd5f-2a74ee4670ad",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795184928283,
+                "durationMs": 4023,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 9,
+                "sessionId": "81304395-4f33-4960-bd5f-2a74ee4670ad",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795184932309,
+                "durationMs": 4041,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 10,
+                "sessionId": "81304395-4f33-4960-bd5f-2a74ee4670ad",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795184936352,
+                "durationMs": 4029,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 11,
+                "sessionId": "81304395-4f33-4960-bd5f-2a74ee4670ad",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795184940392,
+                "durationMs": 6051,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 12,
+                "sessionId": "81304395-4f33-4960-bd5f-2a74ee4670ad",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795184946448,
+                "durationMs": 8062,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 13,
+                "sessionId": "81304395-4f33-4960-bd5f-2a74ee4670ad",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795184954517,
+                "durationMs": 6044,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 14,
+                "sessionId": "81304395-4f33-4960-bd5f-2a74ee4670ad",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795184960566,
+                "durationMs": 4043,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 15,
+                "sessionId": "81304395-4f33-4960-bd5f-2a74ee4670ad",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795184964673,
+                "durationMs": 4038,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 16,
+                "sessionId": "81304395-4f33-4960-bd5f-2a74ee4670ad",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795184968724,
+                "durationMs": 2019,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 17,
+                "sessionId": "81304395-4f33-4960-bd5f-2a74ee4670ad",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795184970744,
+                "durationMs": 6072,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 18,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185213366,
+                "durationMs": 2044,
+                "capability": "ACCESSIBILITY_CONNECTED"
+            },
+            {
+                "id": 19,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185215428,
+                "durationMs": 2011,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 20,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185334012,
+                "durationMs": 11,
+                "capability": "ACCESSIBILITY_CONNECTED"
+            },
+            {
+                "id": 21,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185334023,
+                "durationMs": 2013,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 22,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185336047,
+                "durationMs": 2132,
+                "capability": "ACCESSIBILITY_CONNECTED"
+            },
+            {
+                "id": 23,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185339782,
+                "durationMs": 298,
+                "capability": "ACCESSIBILITY_CONNECTED"
+            },
+            {
+                "id": 24,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185340080,
+                "durationMs": 2078,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 25,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185342212,
+                "durationMs": 2011,
+                "capability": "ACCESSIBILITY_CONNECTED"
+            },
+            {
+                "id": 26,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185344237,
+                "durationMs": 6014,
+                "capability": "ACCESSIBILITY_CONNECTED"
+            },
+            {
+                "id": 27,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185350252,
+                "durationMs": 14036,
+                "capability": "ACCESSIBILITY_CONNECTED"
+            },
+            {
+                "id": 28,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185364289,
+                "durationMs": 16040,
+                "capability": "ACCESSIBILITY_CONNECTED"
+            },
+            {
+                "id": 29,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185380329,
+                "durationMs": 1629,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 30,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185381965,
+                "durationMs": 2382,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 31,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185384360,
+                "durationMs": 2007,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 32,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185386368,
+                "durationMs": 4008,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 33,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185390377,
+                "durationMs": 2006,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 34,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185392384,
+                "durationMs": 10025,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 35,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185402410,
+                "durationMs": 6014,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 36,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185408425,
+                "durationMs": 2003,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 37,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185410429,
+                "durationMs": 4009,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 38,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185414439,
+                "durationMs": 8021,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 39,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185422461,
+                "durationMs": 6037,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 40,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185428501,
+                "durationMs": 6029,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 41,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185434533,
+                "durationMs": 6037,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 42,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185440573,
+                "durationMs": 4014,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 43,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185444588,
+                "durationMs": 4040,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 44,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185448633,
+                "durationMs": 4026,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 45,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185452662,
+                "durationMs": 10064,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 46,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185462730,
+                "durationMs": 6039,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 47,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185468770,
+                "durationMs": 4016,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 48,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185472787,
+                "durationMs": 4032,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 49,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185476824,
+                "durationMs": 6030,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 50,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185482856,
+                "durationMs": 4027,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 51,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185486884,
+                "durationMs": 4022,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 52,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185490907,
+                "durationMs": 4020,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 53,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185494928,
+                "durationMs": 4023,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 54,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185498952,
+                "durationMs": 4040,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 55,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185502993,
+                "durationMs": 2012,
+                "capability": "USAGE_EVENTS_ONLY"
+            },
+            {
+                "id": 56,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "subject": "QAReviewMath",
+                "day": "2026-11-20",
+                "startedWall": 1795185505008,
+                "durationMs": 4024,
+                "capability": "USAGE_EVENTS_ONLY"
+            }
+        ],
+        "events": [
+            {
+                "id": 1,
+                "sessionId": "81304395-4f33-4960-bd5f-2a74ee4670ad",
+                "kind": "STARTED",
+                "atWall": 1795184901977,
+                "detail": "用户手动开始"
+            },
+            {
+                "id": 2,
+                "sessionId": "81304395-4f33-4960-bd5f-2a74ee4670ad",
+                "kind": "EARLY_END",
+                "atWall": 1795184977885,
+                "detail": ""
+            },
+            {
+                "id": 3,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "kind": "STARTED",
+                "atWall": 1795185213377,
+                "detail": "用户手动开始"
+            },
+            {
+                "id": 4,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "kind": "INTERRUPTED",
+                "atWall": 1795185221417,
+                "detail": "监督服务未连续运行，未知时间未计入学习"
+            },
+            {
+                "id": 5,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "kind": "RESUMED",
+                "atWall": 1795185334016,
+                "detail": "用户手动恢复，未补计中断期间"
+            },
+            {
+                "id": 6,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "kind": "DISTRACTION",
+                "atWall": 1795185338215,
+                "detail": "进入受限应用：com.android.chrome"
+            },
+            {
+                "id": 7,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "kind": "DISTRACTION",
+                "atWall": 1795185338961,
+                "detail": "进入受限应用：com.android.chrome"
+            },
+            {
+                "id": 8,
+                "sessionId": "e0e9e6a4-2b29-4e12-8627-6b1c1952c104",
+                "kind": "EMERGENCY_END",
+                "atWall": 1795185509198,
+                "detail": "拦截页面紧急退出"
+            }
+        ],
+        "summaries": [
+            {
+                "day": "2026-11-19",
+                "content": "记录到有效学习 0 分钟；任务 0/0，受限应用访问 0 次，提前结束 0 次。下一次用练习或复述检验掌握程度，再安排复习。以上为本地规则总结，仅依据应用记录，不评价未观察到的学习行为。",
+                "generatedWall": 1795185382134,
+                "source": "OFFLINE_RULES"
+            },
+            {
+                "day": "2026-11-20",
+                "content": "记录到有效学习 4 分钟；任务 0/1，受限应用访问 2 次，提前结束 2 次。下一次先把最容易分心的应用加入限制，再开始一个可完成的小任务。以上为本地规则总结，仅依据应用记录，不评价未观察到的学习行为。",
+                "generatedWall": 1795185509581,
+                "source": "OFFLINE_RULES"
+            }
+        ]
+    },
+    "sha256": "284d666b6c4aefdb29d34f3da918374b32fea31c365411e8ef428eb6bfe8ce13"
+}

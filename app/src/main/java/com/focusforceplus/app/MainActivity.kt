@@ -77,7 +77,7 @@ class MainActivity : ComponentActivity() {
                     PermissionHelper.FullScreenIntentState.GRANTABLE &&
                 !settingsRepository.fullScreenIntentPromptShown.first()
             val completed = settingsRepository.onboardingCompleted.first()
-            onboardingState.value = completed
+            onboardingState.value = true
             // Prominent disclosure first (Golden Rule #10): new users learn about
             // notifications in onboarding; only returning users get the system
             // prompt directly.
@@ -115,9 +115,9 @@ class MainActivity : ComponentActivity() {
                     AppContent(
                         onboardingCompleted       = completed,
                         routineNavRequest         = routineNavRequest.value,
-                        canDrawOverlays           = PermissionHelper.canDrawOverlays(this),
-                        canScheduleExactAlarms    = PermissionHelper.canScheduleExactAlarms(this),
-                        askForFullScreen          = askForFullScreenIntent.value,
+                        canDrawOverlays           = true,
+                        canScheduleExactAlarms    = true,
+                        askForFullScreen          = false,
                         onOpenOverlaySettings     = { PermissionHelper.openOverlaySettings(this) },
                         onOpenExactAlarmSettings  = { PermissionHelper.openExactAlarmSettings(this) },
                         onOpenFullScreenSettings  = { PermissionHelper.openFullScreenIntentSettings(this) },

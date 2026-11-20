@@ -1,0 +1,3 @@
+# Preserve exact third-party evidence bytes and their recorded SHA-256 values.
+third_party/poms/** -text -whitespace
+gradlew text eol=lf
