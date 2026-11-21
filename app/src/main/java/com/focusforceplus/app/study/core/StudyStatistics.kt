@@ -14,7 +14,7 @@ data class StatisticsFilter(
 data class StatisticsSegment(val day: String, val subject: String, val durationMs: Long)
 data class StatisticsTask(val day: String, val subject: String, val completed: Boolean)
 data class StatisticsSession(val id: String, val subject: String, val state: String, val endedWall: Long?)
-data class StatisticsEvent(val id: Long, val sessionId: String, val kind: String, val atWall: Long)
+data class StatisticsEvent(val id: Long, val sessionId: String, val kind: String, val atWall: Long, val detail: String = "")
 data class DailyStatistics(
     val day: LocalDate,
     val durationMs: Long,
@@ -40,7 +40,7 @@ data class StudyStatisticsSnapshot(
     val daily: List<DailyStatistics>,
     val subjects: List<SubjectStatistics>,
     val availableSubjects: List<String>,
-    val recentEventIds: List<Long>,
+    val recentEvents: List<StatisticsEvent>,
     val invalidRecords: Int,
 ) {
     val completionPercent: Int?
@@ -124,8 +124,8 @@ object StudyStatistics {
             subjects = subjects,
             availableSubjects = (segments.map { it.subject } + tasks.map { it.subject } + sessions.map { it.subject })
                 .filter { it.isNotBlank() }.distinct().sorted(),
-            recentEventIds = rangedEvents.sortedWith(compareByDescending<StatisticsEvent> { it.atWall }.thenByDescending { it.id })
-                .take(20).map { it.id },
+            recentEvents = rangedEvents.sortedWith(compareByDescending<StatisticsEvent> { it.atWall }.thenByDescending { it.id })
+                .take(20),
             invalidRecords = invalid,
         )
     }
@@ -157,6 +157,9 @@ fun studyEventLabel(kind: String): String = when (kind) {
     "CHECK" -> "进度检查"
     "SELF_REPORT" -> "自报进度"
     "COMPLETED" -> "达到学习目标"
+    "TASK_REVIEW_PENDING" -> "等待确认任务"
+    "TASK_CONFIRMED" -> "确认完成任务"
+    "TASK_CONTINUED" -> "留待下次继续"
     "EARLY_END" -> "提前结束"
     "EMERGENCY_END" -> "紧急退出"
     else -> "学习记录"

@@ -18,8 +18,8 @@ android {
         applicationId = "io.studyguard.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 15
-        versionName = "0.3.6-dev"
+        versionCode = 16
+        versionName = "0.3.7-dev"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

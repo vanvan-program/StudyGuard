@@ -18,6 +18,8 @@ import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -36,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.dp
+import com.focusforceplus.app.study.core.studyDurationLabel
 
 @Composable
 fun StudyGuardScreen(
@@ -46,6 +49,9 @@ fun StudyGuardScreen(
     onLegacyTools: () -> Unit,
 ) {
     var tab by rememberSaveable { mutableIntStateOf(0) }
+    var startDraft by rememberSaveable { mutableStateOf(StudyStartDraft()) }
+    val review by viewModel.pendingTaskReview.collectAsState()
+    val taskTimes by viewModel.taskStudyTimes.collectAsState()
     val snackbar = remember { SnackbarHostState() }
     val message by viewModel.message.collectAsState()
     val colors = StudyTheme.colors
@@ -97,12 +103,18 @@ fun StudyGuardScreen(
                             when (tab) {
                                 0 -> LearningPage(
                                     viewModel,
+                                    draft = startDraft,
+                                    onDraftChange = { startDraft = it },
+                                    onUsageSettings = onUsageSettings,
                                     onPlan = { tab = 1 },
                                     onSettings = { tab = 3 },
                                     listState = learningListState,
                                     anchors = anchors,
                                 )
-                                1 -> PlanPage(viewModel)
+                                1 -> PlanPage(viewModel) { task ->
+                                    startDraft = StudyStartDraft.forTask(task, taskTimes[task.id] ?: 0L)
+                                    tab = 0
+                                }
                                 2 -> StudyStatisticsPage(viewModel, onStart = { tab = 0 }, onPlan = { tab = 1 })
                                 3 -> SettingsPage(
                                     viewModel,
@@ -144,6 +156,19 @@ fun StudyGuardScreen(
                     SpotlightStore.markDone(context)
                     spotlightVisible = false
                 },
+            )
+        }
+        review?.takeIf { session == null }?.let { pending ->
+            fun choose(complete: Boolean) {
+                viewModel.reviewTask(pending, complete)
+                if (startDraft.taskId == pending.taskId) startDraft = StudyStartDraft()
+            }
+            AlertDialog(
+                onDismissRequest = { choose(false) },
+                title = { Text("这项任务完成了吗？") },
+                text = { Text("「${pending.title}」已累计 ${studyDurationLabel(taskTimes[pending.taskId] ?: 0L)}，计划 ${pending.plannedMinutes} 分钟。") },
+                confirmButton = { TextButton(onClick = { choose(true) }) { Text("任务已完成") } },
+                dismissButton = { TextButton(onClick = { choose(false) }) { Text("下次继续") } },
             )
         }
     }

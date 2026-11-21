@@ -58,7 +58,6 @@ import java.time.format.DateTimeFormatter
 internal fun StudyStatisticsPage(viewModel: StudyViewModel, onStart: () -> Unit, onPlan: () -> Unit) {
     val result by viewModel.statistics.collectAsState()
     val filter by viewModel.statisticsFilter.collectAsState()
-    val events by viewModel.events.collectAsState()
     val summaries by viewModel.summaries.collectAsState()
     val busy by viewModel.busy.collectAsState()
     val colors = StudyTheme.colors
@@ -339,8 +338,7 @@ internal fun StudyStatisticsPage(viewModel: StudyViewModel, onStart: () -> Unit,
                 }
             }
             item { SectionHeading("最近监督事件", modifier = Modifier.padding(top = 12.dp)) }
-            val byId = events.associateBy { it.id }
-            val rangedEvents = snapshot.recentEventIds.mapNotNull(byId::get)
+            val rangedEvents = snapshot.recentEvents
             if (rangedEvents.isEmpty()) {
                 item { Text("所选范围与科目暂无监督事件。", color = colors.muted,
                     style = MaterialTheme.typography.bodySmall) }

@@ -35,12 +35,31 @@ import androidx.compose.ui.unit.dp
 import com.focusforceplus.app.study.core.StudyDurationPresets
 import com.focusforceplus.app.study.core.packageSet
 import com.focusforceplus.app.study.core.remainingDurationLabel
+import com.focusforceplus.app.study.core.studyDurationLabel
 import com.focusforceplus.app.study.core.suggestedStudySubjects
+import com.focusforceplus.app.study.data.StudyTask
 import java.time.LocalDate
+
+internal data class StudyStartDraft(
+    val subject: String = "",
+    val minutes: String = "25",
+    val taskId: Long? = null,
+) : java.io.Serializable {
+    companion object {
+        fun forTask(task: StudyTask, creditedMs: Long): StudyStartDraft {
+            val remaining = (task.plannedMinutes * 60_000L - creditedMs).coerceAtLeast(0)
+            val minutes = if (remaining > 0) (remaining + 59_999) / 60_000 else task.plannedMinutes.toLong()
+            return StudyStartDraft(task.subject, minutes.toString(), task.id)
+        }
+    }
+}
 
 @Composable
 internal fun LearningPage(
     viewModel: StudyViewModel,
+    draft: StudyStartDraft,
+    onDraftChange: (StudyStartDraft) -> Unit,
+    onUsageSettings: () -> Unit,
     onPlan: () -> Unit,
     onSettings: () -> Unit,
     listState: LazyListState = rememberLazyListState(),
@@ -51,17 +70,17 @@ internal fun LearningPage(
     val status by viewModel.runtime.status.collectAsState()
     val profile by viewModel.profile.collectAsState()
     val tasks by viewModel.tasks.collectAsState()
-    val events by viewModel.events.collectAsState()
+    val feedback by viewModel.sessionFeedback.collectAsState()
+    val taskTimes by viewModel.taskStudyTimes.collectAsState()
     val usage by viewModel.usageGranted.collectAsState()
     val accessibility by viewModel.runtime.accessibilityConnected.collectAsState()
     val colors = StudyTheme.colors
     val todayStr = LocalDate.now().toString()
-    var subject by rememberSaveable { mutableStateOf("") }
-    var minutes by rememberSaveable { mutableStateOf("25") }
+    val subject = draft.subject
+    val minutes = draft.minutes
     var mode by rememberSaveable { mutableStateOf("PAPER") }
     var reason by rememberSaveable { mutableStateOf("") }
     var progress by rememberSaveable { mutableStateOf("") }
-    var selectedTaskId by rememberSaveable { mutableStateOf<Long?>(null) }
 
     val current = session
     val selectedCount = packageSet(profile?.blockedPackages.orEmpty()).size
@@ -76,7 +95,7 @@ internal fun LearningPage(
             allTaskSubjects = tasks.map { it.subject },
         )
     }
-    val selectedTask = selectedTaskId?.let { id -> todayPendingTasks.firstOrNull { it.id == id } }
+    val selectedTask = draft.taskId?.let { id -> tasks.firstOrNull { it.id == id && !it.isCompleted } }
 
     PageList(state = listState, modifier = Modifier.testTag("study-learning-list")) {
         item {
@@ -159,15 +178,13 @@ internal fun LearningPage(
                             items(todayPendingTasks, key = { it.id }) { row ->
                                 val active = selectedTask?.id == row.id
                                 StudyQuickChip(
-                                    label = "${row.subject} · ${row.plannedMinutes}分",
+                                    label = "${row.title} · ${row.plannedMinutes}分",
                                     selected = active,
                                     onClick = {
                                         if (active) {
-                                            selectedTaskId = null
+                                            onDraftChange(draft.copy(taskId = null))
                                         } else {
-                                            selectedTaskId = row.id
-                                            subject = row.subject
-                                            minutes = row.plannedMinutes.toString()
+                                            onDraftChange(StudyStartDraft.forTask(row, taskTimes[row.id] ?: 0L))
                                         }
                                     },
                                     modifier = Modifier.widthIn(max = 220.dp),
@@ -180,10 +197,7 @@ internal fun LearningPage(
                         label = "本次学习科目",
                         onChange = { input ->
                             val clean = input.take(60)
-                            subject = clean
-                            if (selectedTask != null && clean.trim() != selectedTask.subject) {
-                                selectedTaskId = null
-                            }
+                            onDraftChange(draft.copy(subject = clean, taskId = selectedTask?.takeIf { it.subject == clean.trim() }?.id))
                         },
                         modifier = Modifier.testTag("study-subject-field"),
                     )
@@ -199,10 +213,7 @@ internal fun LearningPage(
                                     label = chipSubject,
                                     selected = isCurrent,
                                     onClick = {
-                                        subject = chipSubject
-                                        if (selectedTask != null && chipSubject != selectedTask.subject) {
-                                            selectedTaskId = null
-                                        }
+                                        onDraftChange(draft.copy(subject = chipSubject, taskId = selectedTask?.takeIf { it.subject == chipSubject }?.id))
                                     },
                                 )
                             }
@@ -212,7 +223,7 @@ internal fun LearningPage(
                     StudyField(
                         value = minutes,
                         label = "目标有效学习时长（分钟，1–720）",
-                        onChange = { minutes = it.take(3) },
+                        onChange = { onDraftChange(draft.copy(minutes = it.take(3))) },
                         numeric = true,
                         error = if (minutes.isNotBlank() && minutes.toIntOrNull() !in 1..720) "请输入1–720分钟" else null,
                         modifier = Modifier.testTag("study-minutes-field"),
@@ -226,7 +237,7 @@ internal fun LearningPage(
                             StudyQuickChip(
                                 label = "${preset}分钟",
                                 selected = minutes.trim() == preset.toString(),
-                                onClick = { minutes = preset.toString() },
+                                onClick = { onDraftChange(draft.copy(minutes = preset.toString())) },
                             )
                         }
                     }
@@ -236,7 +247,7 @@ internal fun LearningPage(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(
-                                text = "已关联：${selectedTask.title}（达标自动打卡）",
+                                text = "已关联：${selectedTask.title} · 已累计 ${studyDurationLabel(taskTimes[selectedTask.id] ?: 0L)}",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = colors.accent,
                                 maxLines = 2,
@@ -245,7 +256,7 @@ internal fun LearningPage(
                             )
                             StudyTextAction(
                                 text = "取消关联",
-                                onClick = { selectedTaskId = null },
+                                onClick = { onDraftChange(draft.copy(taskId = null)) },
                                 tone = StudyTone.Neutral,
                             )
                         }
@@ -264,9 +275,9 @@ internal fun LearningPage(
                         modifier = Modifier.padding(top = 10.dp),
                     )
                     StudyPrimaryButton(
-                        text = "开始学习",
-                        onClick = { viewModel.start(subject, mode, minutes, selectedTask?.id) },
-                        enabled = status != "正在启动学习监督" && subject.isNotBlank() && minutes.toIntOrNull() in 1..720,
+                        text = if (usage) "开始学习" else "去开启监督权限",
+                        onClick = { if (usage) viewModel.start(subject, mode, minutes, selectedTask?.id) else onUsageSettings() },
+                        enabled = !usage || (status != "正在启动学习监督" && subject.isNotBlank() && minutes.toIntOrNull() in 1..720),
                         modifier = Modifier.padding(top = 14.dp).spotlightAnchor(anchors, "spotlight-start"),
                     )
                     StudySecondaryButton("创建学习计划", onPlan, modifier = Modifier.padding(top = 8.dp))
@@ -274,7 +285,8 @@ internal fun LearningPage(
             }
         } else {
             val linkedTask = linkedTaskId?.let { id -> tasks.firstOrNull { it.id == id } }
-            val sessionDistractions = events.count { it.sessionId == current.id && it.kind == "DISTRACTION" }
+            val sessionFeedback = feedback?.takeIf { it.sessionId == current.id }
+            val sessionDistractions = sessionFeedback?.distractions ?: 0
             item {
                 StudyPanel {
                     Text("已记录有效学习", style = MaterialTheme.typography.labelSmall, color = colors.muted)
@@ -314,9 +326,8 @@ internal fun LearningPage(
                         text = if (current.state == "RUNNING") "暂停并暂时解除限制" else "恢复监督与计时",
                         onClick = { if (current.state == "RUNNING") viewModel.pause() else viewModel.resume() },
                     )
-                    val check = events.firstOrNull { it.sessionId == current.id && it.kind == "CHECK" }
                     Text(
-                        check?.detail ?: "本地监督：请专注完成一个具体任务。每 ${current.checkMinutes} 分钟有效学习检查一次，系统调度可能延迟。",
+                        sessionFeedback?.latestCheck ?: "本地监督：请专注完成一个具体任务。每 ${current.checkMinutes} 分钟有效学习检查一次，系统调度可能延迟。",
                         style = MaterialTheme.typography.bodySmall,
                         color = colors.muted,
                         modifier = Modifier.padding(top = 14.dp, bottom = 10.dp),

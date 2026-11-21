@@ -94,7 +94,10 @@ class StudyRepository @Inject constructor(
         dao.updateTask(id, title.trim().take(500), subject.trim().take(60), day, minutes)
     }
 
-    suspend fun toggleTask(id: Long) = dao.toggleTask(id, System.currentTimeMillis())
+    suspend fun toggleTask(id: Long) = database.withTransaction {
+        dao.toggleTask(id, System.currentTimeMillis())
+        if (dao.taskById(id)?.isCompleted == true) resolveReviews(id, true)
+    }
 
     suspend fun deleteTask(id: Long) = dao.deleteTask(id)
 
@@ -131,12 +134,13 @@ class StudyRepository @Inject constructor(
             require(mode == "PAPER" || mode == "PHONE")
             require(dao.currentSession() == null) { "请先结束或恢复已有会话" }
             if (!runtime.isCurrentRequest(token)) return@withLock null
+            require(runtime.hasUsageAccess()) { "请先开启使用情况访问权限" }
             val profile = dao.profileOnce() ?: StudyProfile()
             val wall = System.currentTimeMillis()
             val session = StudySession(
                 id = UUID.randomUUID().toString(),
                 subject = subject.take(60), mode = mode, targetMs = minutes * 60_000L,
-                state = if (runtime.hasUsageAccess()) "RUNNING" else "INTERRUPTED",
+                state = "RUNNING",
                 startedWall = wall, lastWall = wall, lastElapsed = SystemClock.elapsedRealtime(),
                 blockedPackages = profile.blockedPackages, allowedPackages = profile.allowedPackages,
                 checkMinutes = profile.checkMinutes,
@@ -144,7 +148,7 @@ class StudyRepository @Inject constructor(
             )
             database.withTransaction {
                 dao.saveSession(session)
-                event(session.id, "STARTED", if (session.state == "RUNNING") "用户手动开始" else "缺少使用情况访问权限，未累计时长")
+                event(session.id, "STARTED", "用户手动开始")
             }
             if (!runtime.isCurrentRequest(token)) {
                 val kind = runtime.stopKind?.takeIf { it in setOf("EARLY_END", "EMERGENCY_END") } ?: "EARLY_END"
@@ -186,7 +190,22 @@ class StudyRepository @Inject constructor(
         runtime.status.value = "已暂停；本次限制已解除"
     }
 
-    suspend fun completeTask(taskId: Long) = dao.completeTask(taskId, System.currentTimeMillis())
+    suspend fun completeTask(taskId: Long) = database.withTransaction {
+        dao.completeTask(taskId, System.currentTimeMillis())
+        resolveReviews(taskId, true)
+    }
+
+    private suspend fun resolveReviews(taskId: Long, complete: Boolean) {
+        if (complete) dao.resolveTaskReviews(taskId, "TASK_CONFIRMED", "已确认完成关联任务")
+        else dao.resolveTaskReviews(taskId, "TASK_CONTINUED", "本段时长已累计，任务留待下次继续")
+    }
+
+    suspend fun reviewTask(review: PendingTaskReview, complete: Boolean) = database.withTransaction {
+        val pending = dao.pendingTaskReview().first()
+        if (pending?.sessionId != review.sessionId || pending.taskId != review.taskId) return@withTransaction
+        if (complete) dao.completeTask(review.taskId, System.currentTimeMillis())
+        resolveReviews(review.taskId, complete)
+    }
 
     suspend fun finish(
         kind: String,
@@ -201,7 +220,7 @@ class StudyRepository @Inject constructor(
         val requestedKind = requested?.kind ?: kind
         val requestedReason = requested?.reason ?: reason
         val finalKind = if (requestedKind == "COMPLETED" && session.effectiveMs < session.targetMs) "EARLY_END" else requestedKind
-        val shouldCompleteTask = requested?.completeLinkedTask ?: completeLinkedTask ?: (finalKind == "COMPLETED")
+        val shouldCompleteTask = requested?.completeLinkedTask ?: completeLinkedTask ?: false
         runtime.release(finalKind, requestedReason, shouldCompleteTask)
         val nowWall = System.currentTimeMillis()
         val ended = session.copy(
@@ -212,6 +231,10 @@ class StudyRepository @Inject constructor(
             event(session.id, finalKind, requestedReason.take(500))
             if (shouldCompleteTask && session.linkedTaskId != null) {
                 dao.completeTask(session.linkedTaskId, nowWall)
+                resolveReviews(session.linkedTaskId, true)
+            } else if (finalKind == "COMPLETED" && session.linkedTaskId != null &&
+                dao.taskById(session.linkedTaskId)?.isCompleted == false) {
+                event(session.id, "TASK_REVIEW_PENDING", "本段学习达标，等待确认任务进度")
             }
         }
         if (runtime.current.value?.id == session.id) runtime.current.value = null

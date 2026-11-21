@@ -1,0 +1,136 @@
+{
+  "task": ":app:testDebugUnitTest",
+  "scope": "Host JVM tests; no Android device execution",
+  "tests": 184,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "suites": [
+    {
+      "name": "com.focusforceplus.app.compliance.BlockDecisionTest",
+      "timestamp": "2026-11-21T08:50:50.695Z",
+      "tests": 41,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.047
+    },
+    {
+      "name": "com.focusforceplus.app.compliance.RoutineDurationValidatorTest",
+      "timestamp": "2026-11-21T08:50:50.745Z",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.006
+    },
+    {
+      "name": "com.focusforceplus.app.compliance.TamperProtectionTest",
+      "timestamp": "2026-11-21T08:50:50.754Z",
+      "tests": 18,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.007
+    },
+    {
+      "name": "com.focusforceplus.app.compliance.TodoLimitsTest",
+      "timestamp": "2026-11-21T08:50:50.764Z",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.006
+    },
+    {
+      "name": "com.focusforceplus.app.ExampleUnitTest",
+      "timestamp": "2026-11-21T08:50:50.679Z",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.007
+    },
+    {
+      "name": "com.focusforceplus.app.service.ActiveRoutineRegistryTest",
+      "timestamp": "2026-11-21T08:50:50.772Z",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.013
+    },
+    {
+      "name": "com.focusforceplus.app.study.core.StudyQuickHelpersTest",
+      "timestamp": "2026-11-21T08:50:51.168Z",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.128
+    },
+    {
+      "name": "com.focusforceplus.app.study.StudyBackupCodecTest",
+      "timestamp": "2026-11-21T08:50:50.793Z",
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.181
+    },
+    {
+      "name": "com.focusforceplus.app.study.StudyLedgerTest",
+      "timestamp": "2026-11-21T08:50:50.982Z",
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.02
+    },
+    {
+      "name": "com.focusforceplus.app.study.StudyPlannerTest",
+      "timestamp": "2026-11-21T08:50:51.010Z",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.118
+    },
+    {
+      "name": "com.focusforceplus.app.study.StudyStatisticsTest",
+      "timestamp": "2026-11-21T08:50:51.132Z",
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.029
+    },
+    {
+      "name": "com.focusforceplus.app.study.StudyTimelineTest",
+      "timestamp": "2026-11-21T08:50:51.163Z",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.003
+    },
+    {
+      "name": "com.focusforceplus.app.study.ui.SpotlightPlacementTest",
+      "timestamp": "2026-11-21T08:50:51.299Z",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.008
+    },
+    {
+      "name": "com.focusforceplus.app.study.ui.StudyCalendarTest",
+      "timestamp": "2026-11-21T08:50:51.308Z",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.007
+    }
+  ]
+}

@@ -20,6 +20,7 @@ import com.focusforceplus.app.study.core.throttleWhile
 import com.focusforceplus.app.study.data.StudyProfile
 import com.focusforceplus.app.study.data.StudyRepository
 import com.focusforceplus.app.study.data.StudyTask
+import com.focusforceplus.app.study.data.PendingTaskReview
 import com.focusforceplus.app.study.monitor.StudyMonitorService
 import com.focusforceplus.app.study.monitor.StudyRuntime
 import com.focusforceplus.app.util.InstalledApp
@@ -52,7 +53,12 @@ class StudyViewModel @Inject constructor(
     private val sharing = SharingStarted.WhileSubscribed(5_000)
     val profile = repository.dao.profile().stateIn(viewModelScope, sharing, null)
     val tasks = repository.dao.tasks().stateIn(viewModelScope, sharing, emptyList())
-    val events = repository.dao.recentEventsLimited(200).stateIn(viewModelScope, sharing, emptyList())
+    val sessionFeedback = repository.dao.sessionFeedback().stateIn(viewModelScope, sharing, null)
+    val taskStudyTimes = repository.dao.taskStudyTimes().map { rows -> rows.associate { it.taskId to it.effectiveMs } }
+        .stateIn(viewModelScope, sharing, emptyMap())
+    val pendingTaskReview = repository.dao.pendingTaskReview().stateIn(viewModelScope, sharing, null)
+
+    fun reviewTask(review: PendingTaskReview, complete: Boolean) = action { repository.reviewTask(review, complete) }
     val summaries = repository.dao.summaries().stateIn(viewModelScope, sharing, emptyList())
     val statisticsFilter = MutableStateFlow(StatisticsFilter())
     private val throttledSegments = repository.dao.segments().throttleWhile(
@@ -75,7 +81,7 @@ class StudyViewModel @Inject constructor(
             source.segments.map { StatisticsSegment(it.day, it.subject, it.durationMs) },
             source.tasks.map { StatisticsTask(it.day, it.subject, it.isCompleted) },
             source.sessions.map { StatisticsSession(it.id, it.subject, it.state, it.endedWall) },
-            source.events.map { StatisticsEvent(it.id, it.sessionId, it.kind, it.atWall) },
+            source.events.map { StatisticsEvent(it.id, it.sessionId, it.kind, it.atWall, it.detail) },
         )
     }.flowOn(Dispatchers.Default).stateIn(viewModelScope, sharing, null)
     val apps = MutableStateFlow<List<InstalledApp>>(emptyList())
@@ -197,6 +203,11 @@ class StudyViewModel @Inject constructor(
 
     fun start(subject: String, mode: String, minutes: String, taskId: Long? = null) {
         if (busy.value || runtime.status.value == "正在启动学习监督") return
+        if (!runtime.hasUsageAccess()) {
+            usageGranted.value = false
+            message.value = "请先开启使用情况访问权限"
+            return
+        }
         val duration = minutes.toIntOrNull()
         if (subject.isBlank() || duration !in 1..720) {
             message.value = "请填写科目，学习时长为 1–720 分钟"

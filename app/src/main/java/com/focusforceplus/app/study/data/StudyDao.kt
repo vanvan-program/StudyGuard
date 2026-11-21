@@ -8,6 +8,10 @@ import androidx.room.Upsert
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
+data class TaskStudyTime(val taskId: Long, val effectiveMs: Long)
+data class PendingTaskReview(val sessionId: String, val taskId: Long, val title: String, val plannedMinutes: Int)
+data class SessionFeedback(val sessionId: String, val distractions: Int, val latestCheck: String?)
+
 @Dao
 interface StudyDao {
     @Query("SELECT * FROM study_profile WHERE id = 1")
@@ -27,6 +31,25 @@ interface StudyDao {
 
     @Query("SELECT * FROM study_tasks WHERE id = :id")
     suspend fun taskById(id: Long): StudyTask?
+
+    @Query("SELECT linkedTaskId AS taskId, SUM(effectiveMs) AS effectiveMs FROM study_sessions WHERE linkedTaskId IS NOT NULL GROUP BY linkedTaskId")
+    fun taskStudyTimes(): Flow<List<TaskStudyTime>>
+
+    @Query("""
+        SELECT s.id AS sessionId, t.id AS taskId, t.title, t.plannedMinutes
+        FROM study_events e JOIN study_sessions s ON e.sessionId = s.id
+        JOIN study_tasks t ON t.id = s.linkedTaskId
+        WHERE e.kind = 'TASK_REVIEW_PENDING' AND t.isCompleted = 0
+        ORDER BY e.atWall, e.id LIMIT 1
+    """)
+    fun pendingTaskReview(): Flow<PendingTaskReview?>
+
+    @Query("""
+        UPDATE study_events SET kind = :kind, detail = :detail
+        WHERE kind = 'TASK_REVIEW_PENDING' AND sessionId IN
+          (SELECT id FROM study_sessions WHERE linkedTaskId = :taskId)
+    """)
+    suspend fun resolveTaskReviews(taskId: Long, kind: String, detail: String)
 
     @Query("UPDATE study_tasks SET title = :title, subject = :subject, day = :day, plannedMinutes = :minutes WHERE id = :id")
     suspend fun updateTask(id: Long, title: String, subject: String, day: String, minutes: Int)
@@ -74,8 +97,14 @@ interface StudyDao {
     @Query("SELECT * FROM study_events ORDER BY atWall DESC")
     fun recentEvents(): Flow<List<StudyEvent>>
 
-    @Query("SELECT * FROM study_events ORDER BY atWall DESC LIMIT :limit")
-    fun recentEventsLimited(limit: Int = 200): Flow<List<StudyEvent>>
+    @Query("""
+        SELECT s.id AS sessionId,
+          (SELECT COUNT(*) FROM study_events WHERE sessionId = s.id AND kind = 'DISTRACTION') AS distractions,
+          (SELECT detail FROM study_events WHERE sessionId = s.id AND kind = 'CHECK' ORDER BY atWall DESC, id DESC LIMIT 1) AS latestCheck
+        FROM study_sessions s WHERE s.state IN ('RUNNING', 'PAUSED', 'INTERRUPTED')
+        ORDER BY s.startedWall DESC LIMIT 1
+    """)
+    fun sessionFeedback(): Flow<SessionFeedback?>
 
     @Query("SELECT * FROM study_events WHERE atWall >= :start AND atWall < :end ORDER BY atWall")
     suspend fun eventsBetween(start: Long, end: Long): List<StudyEvent>

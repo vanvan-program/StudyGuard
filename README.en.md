@@ -11,7 +11,7 @@
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.2.10%20%7C%20Compose-7F52FF?style=flat-square)](#tech-stack--building-from-source)
 [![License](https://img.shields.io/badge/License-GPLv3-blue?style=flat-square)](LICENSE)
 
-[Download APK (v0.3.5-dev)](https://github.com/vanvan-program/StudyGuard/releases/tag/v0.3.5-dev) · [User Guide (ZH)](docs/studyguard/使用与安装指南.md) · [Changelog](CHANGELOG.md) · [Validation Report](docs/studyguard/VALIDATION-0.3.5-dev.md) · [Privacy Policy](PRIVACY.md) · [Issues](https://github.com/vanvan-program/StudyGuard/issues)
+[Download APK (v0.3.7-dev)](https://github.com/vanvan-program/StudyGuard/releases/tag/v0.3.7-dev) · [User Guide (ZH)](docs/studyguard/使用与安装指南.md) · [Changelog](CHANGES_STUDYGUARD.md) · [Validation Report](docs/studyguard/VALIDATION-0.3.7-dev.md) · [Privacy Policy](PRIVACY.md) · [Issues](https://github.com/vanvan-program/StudyGuard/issues)
 
 </div>
 
@@ -22,13 +22,13 @@
 StudyGuard brings **study task planning, focus timing, app-distraction reminders, and study analytics** together in a native Android app. It supports both **Paper Study** and **Phone Study** modes, stores all data locally by default, and requires **no account, no ads, and no `INTERNET` permission**.
 
 > [!NOTE]
-> Current version **0.3.5-dev** (Android 8.0+) is a developer preview: study plan drafts and daily summaries use local heuristics rather than online LLMs. The latest task-linking fixes are verified on the official Android 16 emulator; OEM physical devices and long-term background battery behavior remain to be validated.
+> **0.3.7-dev** is a developer preview for Android 8.0 and later. Plans and summaries use local rules. A 45-minute screen-off session passed on the official Android 16 emulator. Battery use and background behavior on physical devices still need testing.
 
 ## Key Features
 
 - **Dual-Mode Study Timer**: Manual start, pause, and resume. **Paper Mode** continues counting while the screen is locked; **Phone Mode** counts only time spent in StudyGuard and your whitelisted study apps.
 - **Task & Plan Management**: Create, edit, reschedule, and complete study tasks; generate local rule-based plan drafts up to 7 days ahead with calendar date picking.
-- **Task-Timer Linking**: Start a study session directly from a task to auto-complete it upon reaching the target duration, optionally mark complete on early finish, and preserve task links across process death.
+- **Study in sessions.** Start an overdue task from the plan, then choose whether to continue later or mark it complete. Accumulated time and pending completion decisions survive an app restart.
 - **Distraction Reminders**: Configure restricted entertainment apps and a study whitelist. Basic mode monitors via Usage Stats and reminds you; optional Accessibility enhancement is available. Always allows phone/messaging, launcher, system settings, and uninstallation.
 - **Progress & Analytics**: Track subject durations, 7/30-day trends, check-in streaks, and local daily summaries.
 - **Local JSON Backup & Restore**: Export study data to JSON and restore with schema, referential integrity, and checksum validation.
@@ -38,7 +38,7 @@ StudyGuard brings **study task planning, focus timing, app-distraction reminders
 
 ## Installation & Updates
 
-1. Download `StudyGuard-0.3.5-dev-release.apk` from [GitHub Releases](https://github.com/vanvan-program/StudyGuard/releases) (`debug` and `androidTest` APKs are for development testing).
+1. Download `StudyGuard-0.3.7-dev-release.apk` from [GitHub Releases](https://github.com/vanvan-program/StudyGuard/releases) (`debug` and `androidTest` APKs are for development testing).
 2. Open the APK in your file manager and follow the system prompt to install.
 3. Package name is `io.studyguard.app` (will not overwrite upstream FocusForcePlus). Signed with the StudyGuard dev certificate for in-place upgrades over matching dev builds; see `SHA256SUMS.txt` in Releases. Self-built APKs use a different signature—export a JSON backup before switching.
 
@@ -46,7 +46,7 @@ StudyGuard brings **study task planning, focus timing, app-distraction reminders
 
 | Permission | Purpose | Requirement |
 | :--- | :--- | :--- |
-| Usage Access | Detect foreground app and track valid Phone Mode study time | On-demand |
+| Usage Access | Detect the foreground app and track supervised study time | Required to start supervision |
 | Notifications | Show active timer status and distraction reminders | On-demand |
 | Accessibility Service | Reads window package names only for stronger reminders; **never reads text, input, or screen content** | Optional |
 | Exact Alarms / DND | Optional reminder utilities retained from upstream | Optional |
@@ -68,17 +68,17 @@ cd StudyGuard
 - On Windows, use `gradlew.bat` or `scripts/Build-StudyGuard.ps1`. See [BUILD-ENCODING.md](docs/studyguard/BUILD-ENCODING.md) for non-ASCII path notes.
 - Release builds enable R8 and resource shrinking. Provide `KEYSTORE_FILE`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, and `KEY_PASSWORD` for custom signing (no private keys are stored in the repository).
 
-### Current Verification Summary (0.3.5-dev)
+### Current Verification Summary (0.3.7-dev)
 
 | Check | Result |
 | :--- | :--- |
-| JVM Unit Tests | 182 passed (0 failed / 0 skipped) |
-| Android 16 `StudyPersistenceTest` | 17 passed |
-| Release E2E Flows | Early-finish completion, force-stop link recovery, target auto-complete passed |
-| Database Migration | Room 10→12, 11→12, and 0.3.4→0.3.5 data retention verified |
+| JVM Unit Tests | 184 passed (0 failed / 0 skipped) |
+| Android 16 device tests | 38 passed |
+| Release checks | 45 minutes of screen-off study, zero monitoring interruptions. Subject-filtered event history and task confirmation after restart also passed |
+| Upgrade | All three test tasks were preserved when upgrading from 0.3.6-dev |
 | Lint Debug | 0 errors / 31 warnings / 10 hints |
 
-See [VALIDATION-0.3.5-dev.md](docs/studyguard/VALIDATION-0.3.5-dev.md) for full evidence and known caveats.
+See [VALIDATION-0.3.7-dev.md](docs/studyguard/VALIDATION-0.3.7-dev.md) for full evidence and known caveats.
 
 ## Attribution & License
 

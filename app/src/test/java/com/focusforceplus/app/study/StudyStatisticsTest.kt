@@ -131,7 +131,7 @@ class StudyStatisticsTest {
             StatisticsEvent(4, "test", "DISTRACTION", wall(1)),
         ))
         assertEquals(2, result.distractions)
-        assertEquals(listOf(3L, 2L), result.recentEventIds)
+        assertEquals(listOf(3L, 2L), result.recentEvents.map { it.id })
     }
 
     @Test fun endedSessionIsCountedByEndDayWithoutRequiringStartInsideRange() {
@@ -154,7 +154,17 @@ class StudyStatisticsTest {
 
     @Test fun recentEventsAreLimitedAndSortedDeterministically() {
         val result = calculate(events = (1L..25L).map { StatisticsEvent(it, "test", "CHECK", wall()) })
-        assertEquals((25L downTo 6L).toList(), result.recentEventIds)
+        assertEquals((25L downTo 6L).toList(), result.recentEvents.map { it.id })
+    }
+
+    @Test fun subjectDetailsSurviveTwoHundredNewerEventsFromAnotherSubject() {
+        val math = StatisticsEvent(1, "math", "DISTRACTION", wall(), "切换到娱乐应用")
+        val newer = (2L..201L).map { StatisticsEvent(it, "english", "CHECK", wall() + it) }
+        val result = calculate(filter(subject = "数学"),
+            sessions = listOf(StatisticsSession("math", "数学", "COMPLETED", wall())),
+            events = newer + math)
+        assertEquals(1, result.distractions)
+        assertEquals(listOf(math), result.recentEvents)
     }
 
     @Test fun subjectRankingUsesDurationThenName() {

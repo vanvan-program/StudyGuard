@@ -33,15 +33,18 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.focusforceplus.app.study.core.StudyDurationPresets
 import com.focusforceplus.app.study.core.suggestedStudySubjects
+import com.focusforceplus.app.study.core.studyDurationLabel
 import com.focusforceplus.app.study.data.StudyProfile
 import com.focusforceplus.app.study.data.StudyTask
 import java.time.LocalDate
 
 @Composable
-internal fun PlanPage(viewModel: StudyViewModel) {
+internal fun PlanPage(viewModel: StudyViewModel, onStudy: (StudyTask) -> Unit) {
     val stored by viewModel.profile.collectAsState()
     val draft by viewModel.draft.collectAsState()
     val tasks by viewModel.tasks.collectAsState()
+    val taskTimes by viewModel.taskStudyTimes.collectAsState()
+    val session by viewModel.runtime.current.collectAsState()
     val busy by viewModel.busy.collectAsState()
     val colors = StudyTheme.colors
     val profile = stored ?: StudyProfile()
@@ -280,9 +283,13 @@ internal fun PlanPage(viewModel: StudyViewModel) {
                             color = colors.muted,
                             modifier = Modifier.padding(top = 3.dp),
                         )
+                        taskTimes[row.id]?.takeIf { it > 0 }?.let {
+                            Text("已累计 ${studyDurationLabel(it)}", style = MaterialTheme.typography.bodySmall, color = colors.muted)
+                        }
                     }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    if (!row.isCompleted && session == null) StudyTextAction("开始学习", { onStudy(row) })
                     StudyTextAction("编辑与改期", { editing = row })
                     StudyTextAction("删除任务", { viewModel.deleteTask(row) }, tone = StudyTone.Danger)
                 }

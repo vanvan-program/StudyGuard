@@ -3,6 +3,7 @@
 StudyGuard 的当前使用说明与验证报告位于 [studyguard/](studyguard/)。
 
 - [使用与安装指南](studyguard/使用与安装指南.md)
+- [0.3.7-dev 验证报告](studyguard/VALIDATION-0.3.7-dev.md)
 - [0.3.5-dev 验证报告](studyguard/VALIDATION-0.3.5-dev.md)
 - [Windows 构建编码说明](studyguard/BUILD-ENCODING.md)
 

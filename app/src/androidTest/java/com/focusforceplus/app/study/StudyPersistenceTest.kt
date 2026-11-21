@@ -40,6 +40,38 @@ import java.util.UUID
 class StudyPersistenceTest {
     private val context: Context get() = InstrumentationRegistry.getInstrumentation().targetContext
 
+    private fun usageMode(): String {
+        val ops = context.getSystemService(android.app.AppOpsManager::class.java)
+        return when (ops.checkOpNoThrow("android:get_usage_stats", android.os.Process.myUid(), context.packageName)) {
+            android.app.AppOpsManager.MODE_ALLOWED -> "allow"
+            android.app.AppOpsManager.MODE_IGNORED -> "ignore"
+            android.app.AppOpsManager.MODE_ERRORED -> "deny"
+            else -> "default"
+        }
+    }
+
+    private fun setUsageMode(mode: String) {
+        val result = InstrumentationRegistry.getInstrumentation().uiAutomation
+            .executeShellCommand("cmd appops set ${context.packageName} GET_USAGE_STATS $mode")
+        android.os.ParcelFileDescriptor.AutoCloseInputStream(result).use { it.readBytes() }
+    }
+
+    @Test fun missingUsagePermissionNeverCreatesASession() = runBlocking {
+        val original = usageMode()
+        val database = memoryDatabase()
+        try {
+            setUsageMode("ignore")
+            val runtime = StudyRuntime(context)
+            val repository = StudyRepository(database, runtime, OfflineStudyAiProvider())
+            assertTrue(runCatching { repository.start("数学", "PAPER", 5, runtime.beginRequest()) }.isFailure)
+            assertTrue(database.studyDao().sessionsOnce().isEmpty())
+            assertTrue(database.studyDao().eventsOnce().isEmpty())
+        } finally {
+            setUsageMode(original)
+            database.close()
+        }
+    }
+
     private fun memoryDatabase(): AppDatabase =
         Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
 
@@ -333,10 +365,22 @@ class StudyPersistenceTest {
             assertFalse(database.studyDao().tasks().first().single().isCompleted)
             assertNull(runtime.linkedTaskId.value)
 
-            // Reached target completion (COMPLETED) auto-completes linked task.
+            // Finishing a one-minute segment only credits that segment to the 25-minute task.
             database.studyDao().saveSession(session("done").copy(effectiveMs = 60_000, linkedTaskId = taskId))
             repository.finish("COMPLETED", "达到目标", "done")
+            val firstReview = database.studyDao().pendingTaskReview().first()!!
+            assertFalse(database.studyDao().tasks().first().single().isCompleted)
+            repository.reviewTask(firstReview, false)
+            assertNull(database.studyDao().pendingTaskReview().first())
+            database.studyDao().saveSession(session("second").copy(effectiveMs = 60_000, linkedTaskId = taskId))
+            repository.finish("COMPLETED", "达到目标", "second")
+            val secondReview = database.studyDao().pendingTaskReview().first()!!
+            repository.reviewTask(firstReview, true)
+            assertFalse(database.studyDao().tasks().first().single().isCompleted)
+            assertEquals(120_000L, database.studyDao().taskStudyTimes().first().single().effectiveMs)
+            repository.reviewTask(secondReview, true)
             assertTrue(database.studyDao().tasks().first().single().isCompleted)
+            assertNull(database.studyDao().pendingTaskReview().first())
             assertNull(runtime.linkedTaskId.value)
         } finally { database.close() }
     }
@@ -390,10 +434,12 @@ class StudyPersistenceTest {
 
     @Test fun taskAssociationSurvivesDatabaseReopenAndFreshRuntime() = runBlocking {
         val name = "studyguard-linked-recovery-${UUID.randomUUID()}.db"
+        val originalMode = usageMode()
         var database = Room.databaseBuilder(context, AppDatabase::class.java, name).build()
         try {
             val runtime = StudyRuntime(context)
             val repository = StudyRepository(database, runtime, OfflineStudyAiProvider())
+            setUsageMode("allow")
             val taskId = repository.addTask("重启后继续", "数学", "2026-11-20", 1)
             val active = repository.start("数学", "PAPER", 1, runtime.beginRequest(), taskId)!!
             database.studyDao().saveSession(active.copy(state = "RUNNING", effectiveMs = 1_500))
@@ -409,8 +455,12 @@ class StudyPersistenceTest {
             assertNull(freshRuntime.lease.value)
             database.studyDao().saveSession(freshRuntime.current.value!!.copy(effectiveMs = active.targetMs))
             recoveredRepository.finish("COMPLETED", "达到目标", active.id)
-            assertTrue(database.studyDao().tasks().first().single().isCompleted)
+            assertFalse(database.studyDao().tasks().first().single().isCompleted)
+            database.close()
+            database = Room.databaseBuilder(context, AppDatabase::class.java, name).build()
+            assertEquals(taskId, database.studyDao().pendingTaskReview().first()!!.taskId)
         } finally {
+            setUsageMode(originalMode)
             database.close()
             context.deleteDatabase(name)
         }
