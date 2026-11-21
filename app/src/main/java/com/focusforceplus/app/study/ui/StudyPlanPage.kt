@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import com.focusforceplus.app.study.core.StudyDurationPresets
 import com.focusforceplus.app.study.core.suggestedStudySubjects
 import com.focusforceplus.app.study.data.StudyProfile
-import com.focusforceplus.app.study.data.StudyTaskRow
+import com.focusforceplus.app.study.data.StudyTask
 import java.time.LocalDate
 
 @Composable
@@ -53,7 +53,7 @@ internal fun PlanPage(viewModel: StudyViewModel) {
     var daily by rememberSaveable(stored?.dailyMinutes) { mutableStateOf(profile.dailyMinutes.toString()) }
     var progressPercent by rememberSaveable(stored?.progressPercent) { mutableStateOf(profile.progressPercent.toString()) }
     var creatingTask by rememberSaveable { mutableStateOf(false) }
-    var editing by remember { mutableStateOf<StudyTaskRow?>(null) }
+    var editing by remember { mutableStateOf<StudyTask?>(null) }
     var editingDraftIndex by remember { mutableStateOf<Int?>(null) }
     var filterDay by rememberSaveable { mutableStateOf(LocalDate.now().toString()) }
     var showExamPicker by rememberSaveable { mutableStateOf(false) }
@@ -65,14 +65,14 @@ internal fun PlanPage(viewModel: StudyViewModel) {
         parsedExam != null && parsedExam.isBefore(today) -> "考试日期不能早于今天，请重新选择"
         else -> null
     }
-    val taskDays = remember(tasks) { tasks.mapNotNull { parseStudyDate(it.task.day) }.toSet() }
-    val existingDaySubjects = remember(tasks) { tasks.map { it.task.day to it.task.subject }.toSet() }
+    val taskDays = remember(tasks) { tasks.mapNotNull { parseStudyDate(it.day) }.toSet() }
+    val existingDaySubjects = remember(tasks) { tasks.map { it.day to it.subject }.toSet() }
     val suggestedSubjects = remember(subjects, tasks, today) {
         suggestedStudySubjects(
             profileSubjects = subjects,
-            pendingTodaySubjects = tasks.filter { it.task.day == today.toString() && !it.isCompleted }
-                .map { it.task.subject },
-            allTaskSubjects = tasks.map { it.task.subject },
+            pendingTodaySubjects = tasks.filter { it.day == today.toString() && !it.isCompleted }
+                .map { it.subject },
+            allTaskSubjects = tasks.map { it.subject },
         )
     }
 
@@ -209,7 +209,7 @@ internal fun PlanPage(viewModel: StudyViewModel) {
                 )
             }
         }
-        val visible = tasks.filter { filterDay.isBlank() || it.task.day == filterDay }
+        val visible = tasks.filter { filterDay.isBlank() || it.day == filterDay }
         item {
             StudyPanel(contentPadding = PaddingValues(16.dp)) {
                 StudyDateField(
@@ -255,7 +255,7 @@ internal fun PlanPage(viewModel: StudyViewModel) {
                 }
             }
         }
-        items(visible, key = { it.task.id }) { row ->
+        items(visible, key = { it.id }) { row ->
             StudyPanel {
                 Row(verticalAlignment = Alignment.Top) {
                     Checkbox(
@@ -275,7 +275,7 @@ internal fun PlanPage(viewModel: StudyViewModel) {
                             color = if (row.isCompleted) colors.muted else colors.ink,
                         )
                         Text(
-                            "${row.task.day} · ${row.task.subject} · ${row.task.plannedMinutes} 分钟",
+                            "${row.day} · ${row.subject} · ${row.plannedMinutes} 分钟",
                             style = MaterialTheme.typography.bodySmall,
                             color = colors.muted,
                             modifier = Modifier.padding(top = 3.dp),
@@ -336,13 +336,13 @@ internal fun PlanPage(viewModel: StudyViewModel) {
     }
     editing?.let { row ->
         TaskFormDialog(
-            dialogKey = "edit-${row.task.id}",
+            dialogKey = "edit-${row.id}",
             dialogTitle = "编辑学习任务",
             confirmLabel = "保存修改",
             initialTitle = row.title,
-            initialSubject = row.task.subject,
-            initialDay = row.task.day,
-            initialMinutes = row.task.plannedMinutes.toString(),
+            initialSubject = row.subject,
+            initialDay = row.day,
+            initialMinutes = row.plannedMinutes.toString(),
             suggestedSubjects = suggestedSubjects,
             onDismiss = { editing = null },
             onSave = { title, subject, day, minutes ->

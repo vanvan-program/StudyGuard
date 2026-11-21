@@ -67,16 +67,16 @@ internal fun LearningPage(
     val selectedCount = packageSet(profile?.blockedPackages.orEmpty()).size
     val exemptCount = packageSet(profile?.allowedPackages.orEmpty()).size
     val todayPendingTasks = remember(tasks, todayStr) {
-        tasks.filter { it.task.day == todayStr && !it.isCompleted }
+        tasks.filter { it.day == todayStr && !it.isCompleted }
     }
     val suggestedSubjects = remember(profile?.subjects, tasks, todayStr) {
         suggestedStudySubjects(
             profileSubjects = profile?.subjects.orEmpty(),
-            pendingTodaySubjects = tasks.filter { it.task.day == todayStr && !it.isCompleted }.map { it.task.subject },
-            allTaskSubjects = tasks.map { it.task.subject },
+            pendingTodaySubjects = tasks.filter { it.day == todayStr && !it.isCompleted }.map { it.subject },
+            allTaskSubjects = tasks.map { it.subject },
         )
     }
-    val selectedTask = selectedTaskId?.let { id -> todayPendingTasks.firstOrNull { it.task.id == id } }
+    val selectedTask = selectedTaskId?.let { id -> todayPendingTasks.firstOrNull { it.id == id } }
 
     PageList(state = listState, modifier = Modifier.testTag("study-learning-list")) {
         item {
@@ -156,18 +156,18 @@ internal fun LearningPage(
                             contentPadding = PaddingValues(bottom = 10.dp),
                             modifier = Modifier.fillMaxWidth().testTag("study-today-tasks"),
                         ) {
-                            items(todayPendingTasks, key = { it.task.id }) { row ->
-                                val active = selectedTask?.task?.id == row.task.id
+                            items(todayPendingTasks, key = { it.id }) { row ->
+                                val active = selectedTask?.id == row.id
                                 StudyQuickChip(
-                                    label = "${row.task.subject} · ${row.task.plannedMinutes}分",
+                                    label = "${row.subject} · ${row.plannedMinutes}分",
                                     selected = active,
                                     onClick = {
                                         if (active) {
                                             selectedTaskId = null
                                         } else {
-                                            selectedTaskId = row.task.id
-                                            subject = row.task.subject
-                                            minutes = row.task.plannedMinutes.toString()
+                                            selectedTaskId = row.id
+                                            subject = row.subject
+                                            minutes = row.plannedMinutes.toString()
                                         }
                                     },
                                     modifier = Modifier.widthIn(max = 220.dp),
@@ -181,7 +181,7 @@ internal fun LearningPage(
                         onChange = { input ->
                             val clean = input.take(60)
                             subject = clean
-                            if (selectedTask != null && clean.trim() != selectedTask.task.subject) {
+                            if (selectedTask != null && clean.trim() != selectedTask.subject) {
                                 selectedTaskId = null
                             }
                         },
@@ -200,7 +200,7 @@ internal fun LearningPage(
                                     selected = isCurrent,
                                     onClick = {
                                         subject = chipSubject
-                                        if (selectedTask != null && chipSubject != selectedTask.task.subject) {
+                                        if (selectedTask != null && chipSubject != selectedTask.subject) {
                                             selectedTaskId = null
                                         }
                                     },
@@ -265,7 +265,7 @@ internal fun LearningPage(
                     )
                     StudyPrimaryButton(
                         text = "开始学习",
-                        onClick = { viewModel.start(subject, mode, minutes, selectedTask?.task?.id) },
+                        onClick = { viewModel.start(subject, mode, minutes, selectedTask?.id) },
                         enabled = status != "正在启动学习监督" && subject.isNotBlank() && minutes.toIntOrNull() in 1..720,
                         modifier = Modifier.padding(top = 14.dp).spotlightAnchor(anchors, "spotlight-start"),
                     )
@@ -273,7 +273,7 @@ internal fun LearningPage(
                 }
             }
         } else {
-            val linkedTask = linkedTaskId?.let { id -> tasks.firstOrNull { it.task.id == id } }
+            val linkedTask = linkedTaskId?.let { id -> tasks.firstOrNull { it.id == id } }
             val sessionDistractions = events.count { it.sessionId == current.id && it.kind == "DISTRACTION" }
             item {
                 StudyPanel {
@@ -330,7 +330,7 @@ internal fun LearningPage(
                 }
             }
             item {
-                var completeLinked by remember(current.id, linkedTask?.task?.id) { mutableStateOf(false) }
+                var completeLinked by remember(current.id, linkedTask?.id) { mutableStateOf(false) }
                 StudyPanel {
                     Text("提前结束", style = MaterialTheme.typography.titleLarge, color = colors.ink)
                     Text(

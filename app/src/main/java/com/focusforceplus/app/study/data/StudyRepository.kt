@@ -3,7 +3,6 @@ package com.focusforceplus.app.study.data
 import android.os.SystemClock
 import androidx.room.withTransaction
 import com.focusforceplus.app.data.db.AppDatabase
-import com.focusforceplus.app.data.db.entity.TodoEntity
 import com.focusforceplus.app.study.ai.StudyAiProvider
 import com.focusforceplus.app.study.ai.PlannedTask
 import com.focusforceplus.app.study.ai.StudyEvidence
@@ -13,7 +12,6 @@ import com.focusforceplus.app.study.backup.BackupSegment
 import com.focusforceplus.app.study.backup.BackupSession
 import com.focusforceplus.app.study.backup.BackupSummary
 import com.focusforceplus.app.study.backup.BackupTask
-import com.focusforceplus.app.study.backup.BackupTodo
 import com.focusforceplus.app.study.backup.StudyBackupCodec
 import com.focusforceplus.app.study.backup.StudyBackupPayload
 import com.focusforceplus.app.study.backup.StudyBackupSummary
@@ -49,7 +47,7 @@ class StudyRepository @Inject constructor(
 
     suspend fun acceptPlan(tasks: List<PlannedTask>): Int = database.withTransaction {
         require(tasks.size <= 84)
-        val existing = dao.tasks().first().map { it.task.day to it.task.subject }.toSet()
+        val existing = dao.tasksOnce().map { it.day to it.subject }.toSet()
         var added = 0
         tasks.distinctBy { it.day to it.subject }.filter { (it.day to it.subject) !in existing }.forEach { task ->
             insertTaskEntry(
@@ -65,15 +63,7 @@ class StudyRepository @Inject constructor(
     }
 
     suspend fun addTask(title: String, subject: String, day: String, minutes: Int): Long =
-        database.withTransaction {
-            insertTaskEntry(
-                title = title,
-                subject = subject,
-                day = day,
-                minutes = minutes,
-                source = "MANUAL",
-            )
-        }
+        insertTaskEntry(title, subject, day, minutes, source = "MANUAL")
 
     private suspend fun insertTaskEntry(
         title: String,
@@ -86,45 +76,27 @@ class StudyRepository @Inject constructor(
         require(title.isNotBlank() && subject.isNotBlank() && minutes in 1..720) {
             "请填写任务名称、科目与 1–720 分钟"
         }
-        val cleanSubject = subject.trim().take(60)
-        val todoId = database.todoDao().insert(
-            TodoEntity(
-                title = title.trim().take(500),
-                description = "StudyGuard · $cleanSubject · $minutes 分钟 · $source",
-                createdAt = System.currentTimeMillis(),
-            ),
-        )
         return dao.insertTask(
             StudyTask(
-                todoId = todoId,
-                subject = cleanSubject,
+                title = title.trim().take(500),
+                subject = subject.trim().take(60),
                 day = day,
                 plannedMinutes = minutes,
                 source = source,
+                createdAt = System.currentTimeMillis(),
             ),
         )
     }
 
-    suspend fun updateTask(row: StudyTaskRow, title: String, subject: String, day: String, minutes: Int) =
-        database.withTransaction {
-            require(title.isNotBlank() && subject.isNotBlank() && minutes in 1..720)
-            LocalDate.parse(day)
-            val todo = database.todoDao().getById(row.task.todoId) ?: return@withTransaction
-            database.todoDao().update(todo.copy(title = title.take(500)))
-            dao.moveTask(row.task.id, subject.take(60), day, minutes)
-        }
-
-    suspend fun toggleTask(row: StudyTaskRow) {
-        val todo = database.todoDao().getById(row.task.todoId) ?: return
-        database.todoDao().update(todo.copy(
-            isCompleted = !todo.isCompleted,
-            completedAt = if (todo.isCompleted) null else System.currentTimeMillis(),
-        ))
+    suspend fun updateTask(id: Long, title: String, subject: String, day: String, minutes: Int) {
+        require(title.isNotBlank() && subject.isNotBlank() && minutes in 1..720)
+        LocalDate.parse(day)
+        dao.updateTask(id, title.trim().take(500), subject.trim().take(60), day, minutes)
     }
 
-    suspend fun deleteTask(row: StudyTaskRow) {
-        database.todoDao().getById(row.task.todoId)?.let { database.todoDao().delete(it) }
-    }
+    suspend fun toggleTask(id: Long) = dao.toggleTask(id, System.currentTimeMillis())
+
+    suspend fun deleteTask(id: Long) = dao.deleteTask(id)
 
     suspend fun recover() = mutex.withLock {
         if (runtime.serviceAlive) return@withLock
@@ -214,17 +186,7 @@ class StudyRepository @Inject constructor(
         runtime.status.value = "已暂停；本次限制已解除"
     }
 
-    suspend fun completeTask(taskId: Long) = database.withTransaction {
-        markTaskCompleted(taskId, System.currentTimeMillis())
-    }
-
-    private suspend fun markTaskCompleted(taskId: Long, completedWall: Long) {
-        val linked = dao.taskById(taskId) ?: return
-        val todo = database.todoDao().getById(linked.todoId) ?: return
-        if (!todo.isCompleted) {
-            database.todoDao().update(todo.copy(isCompleted = true, completedAt = completedWall))
-        }
-    }
+    suspend fun completeTask(taskId: Long) = dao.completeTask(taskId, System.currentTimeMillis())
 
     suspend fun finish(
         kind: String,
@@ -249,7 +211,7 @@ class StudyRepository @Inject constructor(
             dao.saveSession(ended)
             event(session.id, finalKind, requestedReason.take(500))
             if (shouldCompleteTask && session.linkedTaskId != null) {
-                markTaskCompleted(session.linkedTaskId, nowWall)
+                dao.completeTask(session.linkedTaskId, nowWall)
             }
         }
         if (runtime.current.value?.id == session.id) runtime.current.value = null
@@ -357,7 +319,7 @@ class StudyRepository @Inject constructor(
         val end = day.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli()
         val segments = dao.segmentsForDay(day.toString())
         val events = dao.eventsBetween(start, end)
-        val tasks = dao.tasks().first().filter { it.task.day == day.toString() }
+        val tasks = dao.tasks().first().filter { it.day == day.toString() }
         val content = ai.summary(StudyEvidence(
             (segments.sumOf { it.durationMs } / 60_000).toInt(),
             events.count { it.kind == "DISTRACTION" },
@@ -380,19 +342,11 @@ class StudyRepository @Inject constructor(
                         allowedPackages = it.allowedPackages,
                     )
                 },
-                todos = dao.linkedTodosOnce().map {
-                    BackupTodo(
-                        id = it.id, title = it.title, description = it.description,
-                        dueDateTime = it.dueDateTime, priority = it.priority, isCompleted = it.isCompleted,
-                        isRecurring = it.isRecurring, recurringPattern = it.recurringPattern,
-                        snoozeCount = it.snoozeCount, maxSnoozeCount = it.maxSnoozeCount,
-                        rescheduleCount = it.rescheduleCount, maxRescheduleCount = it.maxRescheduleCount,
-                        createdAt = it.createdAt, completedAt = it.completedAt,
-                        postponedTo = it.postponedTo, checklistJson = it.checklistJson,
-                    )
-                },
                 tasks = storedTasks.map {
-                    BackupTask(it.id, it.todoId, it.subject, it.day, it.plannedMinutes, it.source)
+                    BackupTask(
+                        it.id, it.title, it.subject, it.day, it.plannedMinutes, it.source,
+                        it.isCompleted, it.createdAt, it.completedAt,
+                    )
                 },
                 sessions = dao.sessionsOnce().map {
                     BackupSession(
@@ -428,16 +382,11 @@ class StudyRepository @Inject constructor(
             dao.deleteAllEvents()
             dao.deleteAllSegments()
             dao.deleteAllSummaries()
-            dao.deleteLinkedTodos()
             dao.deleteAllTasks()
             dao.deleteAllSessions()
             dao.deleteProfile()
-            val todoIds = mutableMapOf<Long, Long>()
-            payload.todos.forEach { todo ->
-                todoIds[todo.id] = database.todoDao().insert(todo.toEntity().copy(id = 0))
-            }
             val taskIds = payload.tasks.associate { task ->
-                task.id to dao.insertTask(task.toEntity(todoIds.getValue(task.todoId)))
+                task.id to dao.insertTask(task.toEntity())
             }
             dao.insertSessions(payload.sessions.map {
                 it.toEntity().copy(linkedTaskId = it.linkedTaskId?.let(taskIds::getValue))
@@ -464,18 +413,10 @@ class StudyRepository @Inject constructor(
         allowedPackages = allowedPackages,
     )
 
-    private fun BackupTodo.toEntity() = TodoEntity(
-        title = title, description = description, dueDateTime = dueDateTime,
-        priority = priority, isCompleted = isCompleted, isRecurring = isRecurring,
-        recurringPattern = recurringPattern, snoozeCount = snoozeCount,
-        maxSnoozeCount = maxSnoozeCount, rescheduleCount = rescheduleCount,
-        maxRescheduleCount = maxRescheduleCount, createdAt = createdAt,
-        completedAt = completedAt, postponedTo = postponedTo, checklistJson = checklistJson,
-    )
-
-    private fun BackupTask.toEntity(todoId: Long) = StudyTask(
-        todoId = todoId, subject = subject, day = day,
+    private fun BackupTask.toEntity() = StudyTask(
+        title = title, subject = subject, day = day,
         plannedMinutes = plannedMinutes, source = source,
+        isCompleted = isCompleted, createdAt = createdAt, completedAt = completedAt,
     )
 
     private fun BackupSession.toEntity() = StudySession(

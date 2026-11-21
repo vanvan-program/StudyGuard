@@ -18,8 +18,8 @@ android {
         applicationId = "io.studyguard.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 14
-        versionName = "0.3.5-dev"
+        versionCode = 15
+        versionName = "0.3.6-dev"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -95,6 +95,7 @@ android {
     }
     sourceSets {
         getByName("androidTest").assets.srcDir("$projectDir/schemas")
+        getByName("androidTest").assets.srcDir("$projectDir/src/test/resources")
     }
 }
 

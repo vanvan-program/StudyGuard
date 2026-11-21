@@ -1,16 +1,17 @@
 package com.focusforceplus.app.study.backup
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.intOrNull
 import java.security.MessageDigest
 import java.time.LocalDate
 
 @Serializable
 data class StudyBackupPayload(
-    val schemaVersion: Int = 12,
+    val schemaVersion: Int = StudyBackupCodec.SCHEMA_VERSION,
     val profile: BackupProfile? = null,
-    val todos: List<BackupTodo> = emptyList(),
     val tasks: List<BackupTask> = emptyList(),
     val sessions: List<BackupSession> = emptyList(),
     val segments: List<BackupSegment> = emptyList(),
@@ -19,12 +20,12 @@ data class StudyBackupPayload(
 )
 
 @Serializable
-data class StudyBackupEnvelope(
+private data class StudyBackupEnvelope<T>(
     val format: String = StudyBackupCodec.FORMAT,
     val formatVersion: Int = StudyBackupCodec.FORMAT_VERSION,
     val exportedWall: Long,
     val appVersion: String,
-    val payload: StudyBackupPayload,
+    val payload: T,
     val sha256: String,
 )
 
@@ -42,7 +43,33 @@ data class BackupProfile(
 )
 
 @Serializable
-data class BackupTodo(
+data class BackupTask(
+    val id: Long,
+    val title: String,
+    val subject: String,
+    val day: String,
+    val plannedMinutes: Int,
+    val source: String,
+    val isCompleted: Boolean,
+    val createdAt: Long,
+    val completedAt: Long? = null,
+)
+
+// Preserve the field order and defaults used to sign backups from schemas 11 and 12.
+@Serializable
+private data class LegacyStudyBackupPayload(
+    val schemaVersion: Int = 12,
+    val profile: BackupProfile? = null,
+    val todos: List<LegacyBackupTodo> = emptyList(),
+    val tasks: List<LegacyBackupTask> = emptyList(),
+    val sessions: List<BackupSession> = emptyList(),
+    val segments: List<BackupSegment> = emptyList(),
+    val events: List<BackupEvent> = emptyList(),
+    val summaries: List<BackupSummary> = emptyList(),
+)
+
+@Serializable
+private data class LegacyBackupTodo(
     val id: Long,
     val title: String,
     val description: String? = null,
@@ -62,7 +89,7 @@ data class BackupTodo(
 )
 
 @Serializable
-data class BackupTask(
+private data class LegacyBackupTask(
     val id: Long,
     val todoId: Long,
     val subject: String,
@@ -133,8 +160,8 @@ data class StudyBackupSummary(
 object StudyBackupCodec {
     const val FORMAT = "StudyGuardBackup"
     const val FORMAT_VERSION = 1
+    const val SCHEMA_VERSION = 13
     const val MAX_BYTES = 25 * 1024 * 1024
-    private val supportedSchemas = setOf(11, 12)
     private val activeStates = setOf("RUNNING", "PAUSED", "INTERRUPTED")
     private val endedStates = setOf("COMPLETED", "EARLY_END", "EMERGENCY_END")
 
@@ -150,29 +177,72 @@ object StudyBackupCodec {
         validate(payload)
         val checksum = sha256(compact.encodeToString(StudyBackupPayload.serializer(), payload))
         return readable.encodeToString(
-            StudyBackupEnvelope.serializer(),
+            StudyBackupEnvelope.serializer(StudyBackupPayload.serializer()),
             StudyBackupEnvelope(exportedWall = exportedWall, appVersion = appVersion, payload = payload, sha256 = checksum),
         )
     }
 
     fun decode(text: String): StudyBackupPayload {
         require(text.toByteArray(Charsets.UTF_8).size <= MAX_BYTES) { "备份文件超过 25 MB 限制" }
-        val envelope = try {
-            compact.decodeFromString(StudyBackupEnvelope.serializer(), text)
-        } catch (_: SerializationException) {
-            throw IllegalArgumentException("不是有效的 StudyGuard 备份文件")
-        } catch (_: IllegalArgumentException) {
-            throw IllegalArgumentException("不是有效的 StudyGuard 备份文件")
+        val envelope = parseBackup {
+            // Keep the typed field order for checksum verification, including for old backups.
+            compact.decodeFromString(StudyBackupEnvelope.serializer(JsonObject.serializer()), text)
         }
         require(envelope.format == FORMAT) { "备份格式标记不匹配" }
         require(envelope.formatVersion == FORMAT_VERSION) { "不支持的备份格式版本" }
-        require(envelope.payload.schemaVersion in supportedSchemas) { "备份数据库版本不兼容" }
-        val expected = sha256(compact.encodeToString(StudyBackupPayload.serializer(), envelope.payload))
-        require(MessageDigest.isEqual(expected.toByteArray(), envelope.sha256.toByteArray())) {
+        val payload = when ((envelope.payload["schemaVersion"] as? JsonPrimitive)?.intOrNull) {
+            SCHEMA_VERSION -> {
+                val current = parseBackup {
+                    compact.decodeFromJsonElement(StudyBackupPayload.serializer(), envelope.payload)
+                }
+                verifyChecksum(compact.encodeToString(StudyBackupPayload.serializer(), current), envelope.sha256)
+                current
+            }
+            11, 12 -> {
+                val legacy = parseBackup {
+                    compact.decodeFromJsonElement(LegacyStudyBackupPayload.serializer(), envelope.payload)
+                }
+                verifyChecksum(compact.encodeToString(LegacyStudyBackupPayload.serializer(), legacy), envelope.sha256)
+                legacy.toCurrent()
+            }
+            else -> throw IllegalArgumentException("备份数据库版本不兼容")
+        }
+        validate(payload)
+        return payload
+    }
+
+    private inline fun <T> parseBackup(read: () -> T): T = try {
+        read()
+    } catch (_: IllegalArgumentException) {
+        throw IllegalArgumentException("不是有效的 StudyGuard 备份文件")
+    }
+
+    private fun verifyChecksum(canonicalPayload: String, checksum: String) {
+        require(MessageDigest.isEqual(sha256(canonicalPayload).toByteArray(), checksum.toByteArray())) {
             "备份校验失败：内容可能被修改或损坏"
         }
-        validate(envelope.payload)
-        return envelope.payload
+    }
+
+    private fun LegacyStudyBackupPayload.toCurrent(): StudyBackupPayload {
+        val todosById = todos.associateBy { it.id }
+        val linkedTodoIds = tasks.map { it.todoId }.toSet()
+        require(todosById.size == todos.size && todosById.keys.all { it > 0 }) { "备份待办标识无效" }
+        require(linkedTodoIds.size == tasks.size) { "多个学习任务关联同一待办" }
+        require(todosById.keys == linkedTodoIds) { "备份学习任务与旧待办的关联不完整" }
+        return StudyBackupPayload(
+            profile = profile,
+            tasks = tasks.map { task ->
+                val todo = todosById.getValue(task.todoId)
+                BackupTask(
+                    task.id, todo.title, task.subject, task.day, task.plannedMinutes, task.source,
+                    todo.isCompleted, todo.createdAt, todo.completedAt,
+                )
+            },
+            sessions = sessions,
+            segments = segments,
+            events = events,
+            summaries = summaries,
+        )
     }
 
     fun normalizeForRestore(payload: StudyBackupPayload, nowWall: Long): StudyBackupPayload {
@@ -189,7 +259,7 @@ object StudyBackupCodec {
     }
 
     private fun validate(payload: StudyBackupPayload) {
-        require(payload.schemaVersion in supportedSchemas) { "备份数据库版本不兼容" }
+        require(payload.schemaVersion == SCHEMA_VERSION) { "备份数据库版本不兼容" }
         require(payload.profile == null || payload.profile.id == 1) { "用户资料标识无效" }
         payload.profile?.let {
             require(it.goal.length <= 500 && it.subjects.length <= 720) { "用户资料文本过长" }
@@ -197,17 +267,9 @@ object StudyBackupCodec {
             require(it.checkMinutes in 1..180) { "检查间隔无效" }
             require(validDate(it.examDay)) { "考试日期无效" }
         }
-        require(payload.todos.map { it.id }.toSet().size == payload.todos.size) { "备份任务标识重复" }
-        require(payload.todos.all { it.title.isNotBlank() && it.title.length <= 500 }) { "备份待办标题无效" }
         require(payload.tasks.map { it.id }.toSet().size == payload.tasks.size) { "备份学习任务标识重复" }
         require(payload.sessions.map { it.id }.toSet().size == payload.sessions.size) { "备份会话标识重复" }
         require(payload.summaries.map { it.day }.toSet().size == payload.summaries.size) { "备份总结日期重复" }
-        val todoIds = payload.todos.map { it.id }.toSet()
-        val linkedTodoIds = payload.tasks.map { it.todoId }
-        require(linkedTodoIds.toSet().size == linkedTodoIds.size) { "多个学习任务关联同一待办" }
-        require(payload.tasks.all { it.todoId in todoIds }) { "学习任务缺少对应待办" }
-        require(todoIds == linkedTodoIds.toSet()) { "备份包含未关联的学习待办" }
-        require(payload.todos.all { it.id > 0 } && payload.tasks.all { it.id > 0 }) { "备份任务标识无效" }
         val sessionIds = payload.sessions.map { it.id }.toSet()
         val taskIds = payload.tasks.map { it.id }.toSet()
         require(payload.sessions.all { it.linkedTaskId == null || it.linkedTaskId in taskIds }) {
@@ -216,7 +278,8 @@ object StudyBackupCodec {
         require(payload.segments.all { it.sessionId in sessionIds }) { "学习分段缺少对应会话" }
         require(payload.events.all { it.sessionId in sessionIds }) { "学习事件缺少对应会话" }
         require(payload.tasks.all {
-            it.plannedMinutes in 1..720 && it.subject.isNotBlank() && validDate(it.day)
+            it.id > 0 && it.title.isNotBlank() && it.title.length <= 500 &&
+                it.plannedMinutes in 1..720 && it.subject.isNotBlank() && validDate(it.day)
         }) { "备份学习任务字段无效" }
         require(payload.summaries.all { validDate(it.day) }) { "备份总结日期无效" }
         require(payload.sessions.all {

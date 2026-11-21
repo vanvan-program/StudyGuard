@@ -1,0 +1,7 @@
+{
+  "version": "0.3.6-dev",
+  "variant": "release",
+  "earlyEndCompletesTask": true,
+  "processRecoveryRetainsTask": true,
+  "recoveredSessionAutoCompletesTask": true
+}

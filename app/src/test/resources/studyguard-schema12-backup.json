@@ -1,0 +1,64 @@
+{
+    "format": "StudyGuardBackup",
+    "formatVersion": 1,
+    "exportedWall": 62000,
+    "appVersion": "0.3.5-dev",
+    "payload": {
+        "schemaVersion": 12,
+        "profile": null,
+        "todos": [
+            {
+                "id": 42,
+                "title": "旧版已完成学习任务",
+                "description": null,
+                "dueDateTime": null,
+                "priority": 1,
+                "isCompleted": true,
+                "isRecurring": false,
+                "recurringPattern": null,
+                "snoozeCount": 0,
+                "maxSnoozeCount": 2,
+                "rescheduleCount": 0,
+                "maxRescheduleCount": 1,
+                "createdAt": 1000,
+                "completedAt": 61000,
+                "postponedTo": null,
+                "checklistJson": null
+            }
+        ],
+        "tasks": [
+            {
+                "id": 7,
+                "todoId": 42,
+                "subject": "数学",
+                "day": "2026-11-20",
+                "plannedMinutes": 1,
+                "source": "MANUAL"
+            }
+        ],
+        "sessions": [
+            {
+                "id": "legacy-completed",
+                "subject": "数学",
+                "mode": "PAPER",
+                "targetMs": 60000,
+                "state": "COMPLETED",
+                "startedWall": 1000,
+                "lastWall": 61000,
+                "lastElapsed": 61000,
+                "effectiveMs": 60000,
+                "endedWall": 61000,
+                "endReason": "",
+                "blockedPackages": "",
+                "allowedPackages": "",
+                "checkMinutes": 30,
+                "lastCheckEffectiveMs": 0,
+                "linkedTaskId": 7
+            }
+        ],
+        "segments": [],
+        "events": [],
+        "summaries": []
+    },
+    "sha256": "578baee0c08d7a01c1ba5f59f41cb76240c99aa1c5a7dd1c4f4d3d8ad0d5cee5"
+}

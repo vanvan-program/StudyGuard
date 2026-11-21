@@ -1,12 +1,10 @@
 package com.focusforceplus.app.study.data
 
-import androidx.room.Embedded
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.focusforceplus.app.data.db.entity.TodoEntity
 
 @Entity(tableName = "study_profile")
 data class StudyProfile(
@@ -21,29 +19,17 @@ data class StudyProfile(
     val allowedPackages: String = "",
 )
 
-@Entity(
-    tableName = "study_tasks",
-    foreignKeys = [ForeignKey(
-        entity = TodoEntity::class,
-        parentColumns = ["id"],
-        childColumns = ["todoId"],
-        onDelete = ForeignKey.CASCADE,
-    )],
-    indices = [Index("todoId", unique = true), Index("day")],
-)
+@Entity(tableName = "study_tasks", indices = [Index("day")])
 data class StudyTask(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val todoId: Long,
+    val title: String,
     val subject: String,
     val day: String,
     val plannedMinutes: Int,
     val source: String = "OFFLINE_RULES",
-)
-
-data class StudyTaskRow(
-    @Embedded val task: StudyTask,
-    val title: String,
-    val isCompleted: Boolean,
+    val isCompleted: Boolean = false,
+    val createdAt: Long,
+    val completedAt: Long? = null,
 )
 
 @Entity(tableName = "study_sessions", indices = [Index("state"), Index("startedWall")])

@@ -1,0 +1,19 @@
+{
+  "schema12to13": {
+    "passed": true,
+    "studyTasks": 2,
+    "ordinaryTodosUnchanged": true,
+    "preserved": {
+      "study_profile": 0,
+      "study_sessions": 2,
+      "study_segments": 18,
+      "study_events": 8,
+      "study_summaries": 2
+    }
+  },
+  "schema11to13": {
+    "passed": true,
+    "profileUnchanged": true,
+    "summaryDaysPreserved": 4
+  }
+}

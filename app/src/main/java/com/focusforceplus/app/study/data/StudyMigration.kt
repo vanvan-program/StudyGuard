@@ -31,3 +31,23 @@ object StudyTaskLinkMigration : Migration(11, 12) {
         db.execSQL("ALTER TABLE study_sessions ADD COLUMN linkedTaskId INTEGER DEFAULT NULL")
     }
 }
+
+object StudyTaskIsolationMigration : Migration(12, 13) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        statements.forEach(db::execSQL)
+    }
+
+    val statements = listOf(
+        "CREATE TABLE study_tasks_new (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT NOT NULL, subject TEXT NOT NULL, day TEXT NOT NULL, plannedMinutes INTEGER NOT NULL, source TEXT NOT NULL, isCompleted INTEGER NOT NULL, createdAt INTEGER NOT NULL, completedAt INTEGER)",
+        // A left join also keeps the plan fields of any task whose mirror is already missing.
+        "INSERT INTO study_tasks_new (id, title, subject, day, plannedMinutes, source, isCompleted, createdAt, completedAt) SELECT s.id, COALESCE(t.title, s.subject), s.subject, s.day, s.plannedMinutes, s.source, COALESCE(t.isCompleted, 0), COALESCE(t.createdAt, 0), t.completedAt FROM study_tasks s LEFT JOIN todos t ON t.id = s.todoId",
+        // Sessions can still refer to deleted tasks. Never reuse their old IDs.
+        "INSERT INTO sqlite_sequence (name, seq) SELECT 'study_tasks_new', seq FROM sqlite_sequence WHERE name = 'study_tasks' AND NOT EXISTS (SELECT 1 FROM sqlite_sequence WHERE name = 'study_tasks_new')",
+        "UPDATE sqlite_sequence SET seq = MAX(seq, COALESCE((SELECT seq FROM sqlite_sequence WHERE name = 'study_tasks'), 0)) WHERE name = 'study_tasks_new'",
+        // Only remove mirrors explicitly owned by the old study table, after copying the tasks.
+        "DELETE FROM todos WHERE id IN (SELECT todoId FROM study_tasks)",
+        "DROP TABLE study_tasks",
+        "ALTER TABLE study_tasks_new RENAME TO study_tasks",
+        "CREATE INDEX index_study_tasks_day ON study_tasks(day)",
+    )
+}

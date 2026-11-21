@@ -9,8 +9,10 @@ schema_dir = root / "app/schemas/com.focusforceplus.app.data.db.AppDatabase"
 original_schema = json.loads((schema_dir / "10.json").read_text(encoding="utf-8"))["database"]
 new_schema = json.loads((schema_dir / "11.json").read_text(encoding="utf-8"))["database"]
 linked_schema = json.loads((schema_dir / "12.json").read_text(encoding="utf-8"))["database"]
+isolated_schema = json.loads((schema_dir / "13.json").read_text(encoding="utf-8"))["database"]
 migration_source = (root / "app/src/main/java/com/focusforceplus/app/study/data/StudyMigration.kt").read_text(encoding="utf-8")
-statements = re.findall(r'^\s*"(CREATE [^"]+)"[, ]*$', migration_source, flags=re.MULTILINE)
+original_migration, isolation_migration = migration_source.split("object StudyTaskIsolationMigration", 1)
+statements = re.findall(r'^\s*"(CREATE [^"]+)"[, ]*$', original_migration, flags=re.MULTILINE)
 assert len(statements) == 14, f"Unexpected migration statements: {len(statements)}"
 
 
@@ -68,4 +70,34 @@ for entity in linked_schema["entities"]:
     assert metadata(migrated, table) == metadata(linked_expected, table), f"Linked schema differs: {table}"
 assert migrated.execute("SELECT title FROM todos WHERE id=42").fetchone() == ("legacy todo",)
 print("PASS: Room 11->12 task association migration matches exported schema without changing legacy data.")
+isolation_statements = re.findall(r'^\s*"([^"]+)"[, ]*$', isolation_migration, flags=re.MULTILINE)
+migrated.execute(
+    "INSERT INTO todos (id,title,priority,isCompleted,isRecurring,snoozeCount,maxSnoozeCount,"
+    "rescheduleCount,maxRescheduleCount,createdAt,completedAt) VALUES (43,'study title',1,1,0,0,2,0,1,1000,2000)"
+)
+migrated.execute("INSERT INTO study_tasks VALUES (42,43,'Math','2026-11-21',30,'MANUAL')")
+migrated.execute("UPDATE sqlite_sequence SET seq=99 WHERE name='study_tasks'")
+for statement in isolation_statements:
+    migrated.execute(statement)
+isolated_expected = sqlite3.connect(":memory:")
+create_schema(isolated_expected, isolated_schema)
+for entity in isolated_schema["entities"]:
+    table = entity["tableName"]
+    assert metadata(migrated, table) == metadata(isolated_expected, table), f"Isolated schema differs: {table}"
+assert migrated.execute("SELECT id,title FROM todos").fetchall() == [(42, "legacy todo")]
+migrated.execute("DELETE FROM todos")
+assert migrated.execute("SELECT * FROM study_tasks").fetchall() == [
+    (42, "study title", "Math", "2026-11-21", 30, "MANUAL", 1, 1000, 2000),
+]
+assert migrated.execute("SELECT seq FROM sqlite_sequence WHERE name='study_tasks'").fetchone() == (99,)
+assert not migrated.execute("PRAGMA foreign_key_check").fetchall()
+
+# Old sessions can refer to a deleted task even if the old task table is empty.
+empty_tasks = sqlite3.connect(":memory:")
+create_schema(empty_tasks, linked_schema)
+empty_tasks.execute("INSERT INTO sqlite_sequence (name,seq) VALUES ('study_tasks',99)")
+for statement in isolation_statements:
+    empty_tasks.execute(statement)
+assert empty_tasks.execute("SELECT seq FROM sqlite_sequence WHERE name='study_tasks'").fetchone() == (99,)
+print("PASS: Room 12->13 task data, legacy todo isolation, and task ID sequence match expectations.")
 print("Scope: host SQLite verification; Android Room instrumentation NOT executed by this script.")

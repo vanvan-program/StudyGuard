@@ -2,9 +2,11 @@
 
 面向自主学习的 Android 应用：把学习任务、专注计时、应用使用提醒和学习统计放在一起。支持纸书与手机学习模式，数据默认保存在本机，无账号、无广告、不申请联网权限。
 
-**[下载安装包](https://github.com/vanvan-program/StudyGuard/releases/tag/v0.3.5-dev)** · [使用指南](docs/studyguard/使用与安装指南.md) · [验证结果](docs/studyguard/VALIDATION-0.3.5-dev.md) · [问题反馈](https://github.com/vanvan-program/StudyGuard/issues)
+**[下载安装包](https://github.com/vanvan-program/StudyGuard/releases/tag/v0.3.6-dev)** · [使用指南](docs/studyguard/使用与安装指南.md) · [验证结果](docs/studyguard/VALIDATION-0.3.6-dev.md) · [问题反馈](https://github.com/vanvan-program/StudyGuard/issues)
 
-当前版本 **0.3.5-dev**，支持 Android 8.0 及以上。当前为开发预览版：计划与总结使用本地规则，尚未接入在线大模型；已在 Android 16 官方模拟器验证本次任务修复，厂商真机与长期后台运行仍待验证。
+当前公开开发预览版为 **0.3.6-dev**，最低支持 Android 8.0。计划与总结使用本地规则，尚未接入在线大模型；本版设备验收覆盖 Android 16 官方模拟器，其他 Android 版本、厂商真机与长期后台运行仍待验证。
+
+本版将学习任务与原版待办独立保存，修复原版恢复、清理及删除待办会误删学习任务的问题；支持升级迁移和旧版学习备份。183 项 JVM 单测与 Android 16 的完整 37 项设备测试通过，Release 的三个任务关联流程实测通过。日常试用下载 `StudyGuard-0.3.6-dev-release.apk`，修复内容、测试与签名见 [0.3.6-dev 验证报告](docs/studyguard/VALIDATION-0.3.6-dev.md)。
 
 ## 可以做什么
 
@@ -20,7 +22,7 @@
 
 ## 安装与更新
 
-在 [Releases](https://github.com/vanvan-program/StudyGuard/releases) 下载 `StudyGuard-0.3.5-dev-release.apk`，用手机文件管理器打开并按系统提示安装。`debug` 和 `androidTest` 包面向开发测试，日常试用选 `release`。
+在 [0.3.6-dev Release](https://github.com/vanvan-program/StudyGuard/releases/tag/v0.3.6-dev) 下载 `StudyGuard-0.3.6-dev-release.apk`，用手机文件管理器打开并按系统提示安装。`debug` 和 `androidTest` 包面向开发测试，日常试用选 `release`。
 
 包名为 `io.studyguard.app`，不会覆盖上游 FocusForcePlus。本版沿用已有 StudyGuard 开发证书，可覆盖同签名旧开发版；证书及安装包校验值见验证报告和 Release 附件中的 `SHA256SUMS.txt`。自行构建的包通常签名不同，更新前请先保存备份。
 
@@ -44,20 +46,20 @@ Windows 可使用 `gradlew.bat`，或现有 `scripts/Build-StudyGuard.ps1`。必
 
 Release 构建启用 R8 和资源收缩。自行签名时设置 `KEYSTORE_FILE`、`KEYSTORE_PASSWORD`、`KEY_ALIAS`、`KEY_PASSWORD`；没有签名配置和本地兼容密钥时生成未签名 Release。仓库不含私钥。GitHub 的手动构建流程只生成 Debug 测试包，不自动发布 Release。
 
-## 当前验证结果
+## 0.3.6-dev 验证结果
 
-2026-11-20 对本次任务关联修复的验证：
+2026-11-21 对本次学习任务隔离与升级修复的验证：
 
 | 项目 | 结果 |
 | --- | --- |
-| JVM 单元测试 | 182 项通过，0 失败、0 错误、0 跳过 |
-| Android 16 `StudyPersistenceTest` | 17 项通过 |
+| JVM 单元测试 | 183 项通过，0 失败、0 错误、0 跳过 |
+| Android 16 完整设备回归 | 37 项通过，含 22 项数据持久化与迁移用例 |
 | Release 实际操作 | 提前结束完成任务、强停恢复关联、恢复后达到目标自动完成均通过 |
-| 数据升级 | Room 10→12、11→12 及 0.3.4→0.3.5 数据保留验证通过 |
+| 数据升级 | Room 10→13、11→13、12→13 迁移及旧版覆盖安装数据保留验证通过 |
 | 构建 | Debug、AndroidTest 与 R8 Release 成功 |
 | Lint Debug | 0 errors、31 warnings、10 hints |
 
-详细证据见 [验证报告](docs/studyguard/VALIDATION-0.3.5-dev.md)。本次未宣称全部设备用例通过：之前识别的两处日历测试定位/断言问题仍待处理，厂商真机、长期后台和耗电未验收。
+详细证据见 [验证报告](docs/studyguard/VALIDATION-0.3.6-dev.md)，包括日历测试修正与删除任务结果验证。历史版本的结果保留在 [0.3.5-dev 报告](docs/studyguard/VALIDATION-0.3.5-dev.md)。厂商真机、长期后台和耗电仍待验收。
 
 ## 来源与许可证
 

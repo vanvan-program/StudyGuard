@@ -1,0 +1,580 @@
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.ExampleInstrumentedTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+com.focusforceplus.app.ExampleInstrumentedTest:
+INSTRUMENTATION_STATUS: test=useAppContext
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.ExampleInstrumentedTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=useAppContext
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyBlockedUiTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+com.focusforceplus.app.study.StudyBlockedUiTest:
+INSTRUMENTATION_STATUS: test=blockedPageKeepsAllThreeExitsAndEmergencyIsDirect
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyBlockedUiTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=blockedPageKeepsAllThreeExitsAndEmergencyIsDirect
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyCalendarUiTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+com.focusforceplus.app.study.StudyCalendarUiTest:
+INSTRUMENTATION_STATUS: test=pickingDateFromCalendarUpdatesFieldOnlyAfterConfirm
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyCalendarUiTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=pickingDateFromCalendarUpdatesFieldOnlyAfterConfirm
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyCalendarUiTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=monthYearSwitcherNavigatesAcrossMonths
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyCalendarUiTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Failed to inject touch input.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'calendar-month-title')
+However, the unmerged tree contains '1' node that matches. Are you missing `useUnmergedNode = true` in your finder?
+
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+	at androidx.compose.ui.test.ActionsKt.performTouchInput(Actions.kt:402)
+	at androidx.compose.ui.test.AndroidActions.performClickImpl(Actions.android.kt:23)
+	at androidx.compose.ui.test.ActionsKt.performClick(Actions.kt:60)
+	at com.focusforceplus.app.study.StudyCalendarUiTest.monthYearSwitcherNavigatesAcrossMonths(StudyCalendarUiTest.kt:82)
+
+INSTRUMENTATION_STATUS: stream=
+Error in monthYearSwitcherNavigatesAcrossMonths(com.focusforceplus.app.study.StudyCalendarUiTest):
+java.lang.AssertionError: Failed to inject touch input.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'calendar-month-title')
+However, the unmerged tree contains '1' node that matches. Are you missing `useUnmergedNode = true` in your finder?
+
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+	at androidx.compose.ui.test.ActionsKt.performTouchInput(Actions.kt:402)
+	at androidx.compose.ui.test.AndroidActions.performClickImpl(Actions.android.kt:23)
+	at androidx.compose.ui.test.ActionsKt.performClick(Actions.kt:60)
+	at com.focusforceplus.app.study.StudyCalendarUiTest.monthYearSwitcherNavigatesAcrossMonths(StudyCalendarUiTest.kt:82)
+
+INSTRUMENTATION_STATUS: test=monthYearSwitcherNavigatesAcrossMonths
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyCalendarUiTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=filterDateFieldAndDialogSupportClearingToAllDates
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyCalendarUiTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=filterDateFieldAndDialogSupportClearingToAllDates
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=6
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+com.focusforceplus.app.study.StudyPersistenceTest:
+INSTRUMENTATION_STATUS: test=migrationTwelveToThirteenMovesOnlyLinkedTodosAndPreservesSessionAssociation
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=6
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=migrationTwelveToThirteenMovesOnlyLinkedTodosAndPreservesSessionAssociation
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=7
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=taskAssociationSurvivesDatabaseReopenAndFreshRuntime
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=7
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=taskAssociationSurvivesDatabaseReopenAndFreshRuntime
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=8
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=emergencyEndRecordsSubMinuteSessionAndIsIdempotent
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=8
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=emergencyEndRecordsSubMinuteSessionAndIsIdempotent
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=9
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=earlyEndThroughViewModelCompletesSelectedTaskAfterRestrictionsRelease
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=9
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=earlyEndThroughViewModelCompletesSelectedTaskAfterRestrictionsRelease
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=10
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=migrationTenToThirteenPreservesOriginalTodos
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=10
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=migrationTenToThirteenPreservesOriginalTodos
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=11
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=studyTaskEditsAndDeletionLeaveSameIdTodoUntouched
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=11
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=studyTaskEditsAndDeletionLeaveSameIdTodoUntouched
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=12
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=schemaElevenAndTwelveStudyBackupsRestoreWithoutChangingLegacyTodos
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=12
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=schemaElevenAndTwelveStudyBackupsRestoreWithoutChangingLegacyTodos
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=13
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=legacyTodoDeletionCleanupAndBackupRestorePreserveStudyData
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=13
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=legacyTodoDeletionCleanupAndBackupRestorePreserveStudyData
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=14
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=staleEndRequestCannotFinishNextSession
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=14
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=staleEndRequestCannotFinishNextSession
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=15
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=manualAddTaskAllowsMultipleSameDaySubjectsAndSupportsToggle
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=15
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=manualAddTaskAllowsMultipleSameDaySubjectsAndSupportsToggle
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=16
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=profileAndTaskPersistAcrossDatabaseReopen
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=16
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=profileAndTaskPersistAcrossDatabaseReopen
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=17
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=regeneratingPlanDoesNotOverwriteExistingTask
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=17
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=regeneratingPlanDoesNotOverwriteExistingTask
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=18
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=backupRestoreReplacesStudyDataAndPreservesUnrelatedTodo
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=18
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=backupRestoreReplacesStudyDataAndPreservesUnrelatedTodo
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=19
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=backupRestoreRemapsTaskLinksAndDeletedTasksExportWithoutDanglingLinks
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=19
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=backupRestoreRemapsTaskLinksAndDeletedTasksExportWithoutDanglingLinks
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=20
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=stoppingServiceAfterPausePreservesPausedStatus
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=20
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=stoppingServiceAfterPausePreservesPausedStatus
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=21
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=finishLinkedTaskCompletionBehaviorMatchesCompletionKind
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=21
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=finishLinkedTaskCompletionBehaviorMatchesCompletionKind
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=22
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=processRecoveryDoesNotCreditUnknownTime
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=22
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=processRecoveryDoesNotCreditUnknownTime
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=23
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=serviceTeardownHonorsPendingTaskCompletionAndWritesOnlyOneEnd
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=23
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=serviceTeardownHonorsPendingTaskCompletionAndWritesOnlyOneEnd
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=24
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=updatingSessionCannotCascadeDeleteSegments
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=24
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=updatingSessionCannotCascadeDeleteSegments
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=25
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=migrationElevenToThirteenPreservesSessionsTasksAndSegments
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyPersistenceTest
+INSTRUMENTATION_STATUS: current=25
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=migrationElevenToThirteenPreservesSessionsTasksAndSegments
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyStatisticsUiTest
+INSTRUMENTATION_STATUS: current=26
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+com.focusforceplus.app.study.StudyStatisticsUiTest:
+INSTRUMENTATION_STATUS: test=emptyChartRemainsReadableAtLargeFontScale
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyStatisticsUiTest
+INSTRUMENTATION_STATUS: current=26
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=emptyChartRemainsReadableAtLargeFontScale
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyStatisticsUiTest
+INSTRUMENTATION_STATUS: current=27
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=selectingDateShowsItsActualDuration
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyStatisticsUiTest
+INSTRUMENTATION_STATUS: current=27
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=selectingDateShowsItsActualDuration
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyUiTest
+INSTRUMENTATION_STATUS: current=28
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+com.focusforceplus.app.study.StudyUiTest:
+INSTRUMENTATION_STATUS: test=planPageAllowsManualTaskCreationAndDeletion
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyUiTest
+INSTRUMENTATION_STATUS: current=28
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=planPageAllowsManualTaskCreationAndDeletion
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyUiTest
+INSTRUMENTATION_STATUS: current=29
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=blockedAppsSupportSelectAllAndPerAppExemption
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyUiTest
+INSTRUMENTATION_STATUS: current=29
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=blockedAppsSupportSelectAllAndPerAppExemption
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyUiTest
+INSTRUMENTATION_STATUS: current=30
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=settingsShowPermissionAndDegradedMode
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyUiTest
+INSTRUMENTATION_STATUS: current=30
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=settingsShowPermissionAndDegradedMode
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyUiTest
+INSTRUMENTATION_STATUS: current=31
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=learningPageDurationPresetsFillMinutesAndHideIdleEmergencyExit
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyUiTest
+INSTRUMENTATION_STATUS: current=31
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=learningPageDurationPresetsFillMinutesAndHideIdleEmergencyExit
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyUiTest
+INSTRUMENTATION_STATUS: current=32
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=spotlightOnboardingReplaysAndCompletesThreeSteps
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyUiTest
+INSTRUMENTATION_STATUS: current=32
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=spotlightOnboardingReplaysAndCompletesThreeSteps
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyUiTest
+INSTRUMENTATION_STATUS: current=33
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=planDateFieldsOpenCalendarPickerInsteadOfTextInput
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyUiTest
+INSTRUMENTATION_STATUS: current=33
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Failed to assert the following: (Text + InputText + EditableText contains '2026-11-21 · 今天' (ignoreCase: false))
+Semantics of the node:
+Node #2124 at (l=95.0, t=1088.0, r=985.0, b=1235.0)px, Tag: 'study-exam-date-field'
+Has 1 child, 6 siblings
+Selector used: (TestTag = 'study-exam-date-field')
+
+	at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:264)
+	at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+	at androidx.compose.ui.test.AssertionsKt.assertTextContains(Assertions.kt:208)
+	at androidx.compose.ui.test.AssertionsKt.assertTextContains$default(Assertions.kt:204)
+	at com.focusforceplus.app.study.StudyUiTest.planDateFieldsOpenCalendarPickerInsteadOfTextInput(StudyUiTest.kt:74)
+
+INSTRUMENTATION_STATUS: stream=
+Error in planDateFieldsOpenCalendarPickerInsteadOfTextInput(com.focusforceplus.app.study.StudyUiTest):
+java.lang.AssertionError: Failed to assert the following: (Text + InputText + EditableText contains '2026-11-21 · 今天' (ignoreCase: false))
+Semantics of the node:
+Node #2124 at (l=95.0, t=1088.0, r=985.0, b=1235.0)px, Tag: 'study-exam-date-field'
+Has 1 child, 6 siblings
+Selector used: (TestTag = 'study-exam-date-field')
+
+	at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:264)
+	at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+	at androidx.compose.ui.test.AssertionsKt.assertTextContains(Assertions.kt:208)
+	at androidx.compose.ui.test.AssertionsKt.assertTextContains$default(Assertions.kt:204)
+	at com.focusforceplus.app.study.StudyUiTest.planDateFieldsOpenCalendarPickerInsteadOfTextInput(StudyUiTest.kt:74)
+
+INSTRUMENTATION_STATUS: test=planDateFieldsOpenCalendarPickerInsteadOfTextInput
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyUiTest
+INSTRUMENTATION_STATUS: current=34
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=planDisclosesOfflineRulesAndStatisticsAreReachable
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyUiTest
+INSTRUMENTATION_STATUS: current=34
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=planDisclosesOfflineRulesAndStatisticsAreReachable
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyUiTest
+INSTRUMENTATION_STATUS: current=35
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=statisticsFiltersAndDefinitionsAreReachable
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.focusforceplus.app.study.StudyUiTest
+INSTRUMENTATION_STATUS: current=35
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=35
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=statisticsFiltersAndDefinitionsAreReachable
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_RESULT: stream=
+
+Time: 67.348
+There were 2 failures:
+1) monthYearSwitcherNavigatesAcrossMonths(com.focusforceplus.app.study.StudyCalendarUiTest)
+java.lang.AssertionError: Failed to inject touch input.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'calendar-month-title')
+However, the unmerged tree contains '1' node that matches. Are you missing `useUnmergedNode = true` in your finder?
+
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+	at androidx.compose.ui.test.ActionsKt.performTouchInput(Actions.kt:402)
+	at androidx.compose.ui.test.AndroidActions.performClickImpl(Actions.android.kt:23)
+	at androidx.compose.ui.test.ActionsKt.performClick(Actions.kt:60)
+	at com.focusforceplus.app.study.StudyCalendarUiTest.monthYearSwitcherNavigatesAcrossMonths(StudyCalendarUiTest.kt:82)
+2) planDateFieldsOpenCalendarPickerInsteadOfTextInput(com.focusforceplus.app.study.StudyUiTest)
+java.lang.AssertionError: Failed to assert the following: (Text + InputText + EditableText contains '2026-11-21 · 今天' (ignoreCase: false))
+Semantics of the node:
+Node #2124 at (l=95.0, t=1088.0, r=985.0, b=1235.0)px, Tag: 'study-exam-date-field'
+Has 1 child, 6 siblings
+Selector used: (TestTag = 'study-exam-date-field')
+
+	at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:264)
+	at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+	at androidx.compose.ui.test.AssertionsKt.assertTextContains(Assertions.kt:208)
+	at androidx.compose.ui.test.AssertionsKt.assertTextContains$default(Assertions.kt:204)
+	at com.focusforceplus.app.study.StudyUiTest.planDateFieldsOpenCalendarPickerInsteadOfTextInput(StudyUiTest.kt:74)
+
+FAILURES!!!
+Tests run: 35,  Failures: 2
+
+
+INSTRUMENTATION_CODE: -1

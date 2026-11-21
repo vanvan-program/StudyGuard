@@ -19,7 +19,7 @@ import com.focusforceplus.app.study.core.StudyStatistics
 import com.focusforceplus.app.study.core.throttleWhile
 import com.focusforceplus.app.study.data.StudyProfile
 import com.focusforceplus.app.study.data.StudyRepository
-import com.focusforceplus.app.study.data.StudyTaskRow
+import com.focusforceplus.app.study.data.StudyTask
 import com.focusforceplus.app.study.monitor.StudyMonitorService
 import com.focusforceplus.app.study.monitor.StudyRuntime
 import com.focusforceplus.app.util.InstalledApp
@@ -73,7 +73,7 @@ class StudyViewModel @Inject constructor(
         StudyStatistics.calculate(
             filter,
             source.segments.map { StatisticsSegment(it.day, it.subject, it.durationMs) },
-            source.tasks.map { StatisticsTask(it.task.day, it.task.subject, it.isCompleted) },
+            source.tasks.map { StatisticsTask(it.day, it.subject, it.isCompleted) },
             source.sessions.map { StatisticsSession(it.id, it.subject, it.state, it.endedWall) },
             source.events.map { StatisticsEvent(it.id, it.sessionId, it.kind, it.atWall) },
         )
@@ -178,15 +178,15 @@ class StudyViewModel @Inject constructor(
 
     suspend fun loadAppIcon(packageName: String): Drawable? = installedApps.loadIcon(packageName)
 
-    fun toggleTask(row: StudyTaskRow) = action { repository.toggleTask(row) }
-    fun deleteTask(row: StudyTaskRow) = action { repository.deleteTask(row) }
+    fun toggleTask(row: StudyTask) = action { repository.toggleTask(row.id) }
+    fun deleteTask(row: StudyTask) = action { repository.deleteTask(row.id) }
     fun addTask(title: String, subject: String, day: String, minutes: String, onAdded: () -> Unit = {}) = action {
         repository.addTask(title, subject, day, minutes.toIntOrNull() ?: error("请输入有效分钟数"))
         onAdded()
         message.value = "已添加学习任务"
     }
-    fun editTask(row: StudyTaskRow, title: String, subject: String, day: String, minutes: String) = action {
-        repository.updateTask(row, title, subject, day, minutes.toIntOrNull() ?: error("请输入有效分钟数"))
+    fun editTask(row: StudyTask, title: String, subject: String, day: String, minutes: String) = action {
+        repository.updateTask(row.id, title, subject, day, minutes.toIntOrNull() ?: error("请输入有效分钟数"))
     }
     fun removeDraftTask(index: Int) {
         draft.update { list -> list.filterIndexed { i, _ -> i != index } }
@@ -321,7 +321,7 @@ class StudyViewModel @Inject constructor(
 
 private data class StatisticsSource(
     val segments: List<com.focusforceplus.app.study.data.StudySegment>,
-    val tasks: List<StudyTaskRow>,
+    val tasks: List<StudyTask>,
     val sessions: List<com.focusforceplus.app.study.data.StudySession>,
     val events: List<com.focusforceplus.app.study.data.StudyEvent>,
 )

@@ -79,7 +79,8 @@ class StudyCalendarUiTest {
             }
         }
 
-        compose.onNodeWithTag("calendar-month-title").performClick()
+        // The clickable month heading merges its Text child's semantics.
+        compose.onNodeWithTag("calendar-month-title", useUnmergedTree = true).performClick()
         compose.onNodeWithTag("calendar-next").performClick()
         compose.onNodeWithText("2027年").assertIsDisplayed()
         compose.onNodeWithTag("calendar-month-6").performClick()

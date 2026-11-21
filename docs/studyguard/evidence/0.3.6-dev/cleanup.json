@@ -1,0 +1,16 @@
+{
+  "databaseIntegrity": "ok",
+  "foreignKeyCheck": "ok",
+  "allBaselineRowsRestored": true,
+  "testOnlyPreferencesRemoved": true,
+  "usageAccessAppOpRestored": "default",
+  "installedVersion": "0.3.6-dev release",
+  "studyCounts": {
+    "study_profile": 1,
+    "study_sessions": 0,
+    "study_segments": 0,
+    "study_events": 0,
+    "study_summaries": 4,
+    "study_tasks": 0
+  }
+}

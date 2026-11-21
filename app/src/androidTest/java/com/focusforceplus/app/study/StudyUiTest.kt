@@ -3,7 +3,9 @@ package com.focusforceplus.app.study
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isEnabled
@@ -16,6 +18,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextReplacement
+import androidx.test.espresso.Espresso.closeSoftKeyboard
 import com.focusforceplus.app.study.ui.StudyGuardActivity
 import org.junit.Rule
 import org.junit.Test
@@ -71,13 +74,16 @@ class StudyUiTest {
         val today = LocalDate.now()
         compose.onNodeWithTag("calendar-day-$today").performClick()
         compose.onNodeWithTag("calendar-confirm").performClick()
-        compose.onNodeWithTag("study-exam-date-field").assertTextContains("$today · 今天")
+        // The tag belongs to the field container; the displayed value is its child.
+        compose.onNodeWithTag("study-exam-date-field")
+            .assert(hasAnyDescendant(hasText("$today · 今天")))
 
         compose.onNodeWithTag("study-plan-list").performScrollToNode(hasTestTag("study-filter-date-field"))
         compose.onNodeWithTag("study-filter-date-field").performClick()
         compose.onNodeWithTag("study-calendar-dialog").assertIsDisplayed()
         compose.onNodeWithTag("calendar-clear").performClick()
-        compose.onNodeWithTag("study-filter-date-field").assertTextContains("全部日期")
+        compose.onNodeWithTag("study-filter-date-field")
+            .assert(hasAnyDescendant(hasText("全部日期")))
     }
 
     @Test fun statisticsFiltersAndDefinitionsAreReachable() {
@@ -169,17 +175,29 @@ class StudyUiTest {
     }
 
     @Test fun planPageAllowsManualTaskCreationAndDeletion() {
+        val taskTitle = "手动测试任务-${System.nanoTime()}"
         dismissSpotlightIfShown()
         compose.onNodeWithText("计划").performClick()
         compose.onNodeWithTag("study-plan-list").performScrollToNode(hasTestTag("study-add-task"))
         compose.onNodeWithTag("study-add-task").performClick()
-        compose.onNodeWithTag("task-dialog-title").performTextReplacement("手动测试任务")
+        compose.onNodeWithTag("task-dialog-title").performTextReplacement(taskTitle)
         compose.onNodeWithTag("task-dialog-subject").performTextReplacement("政治")
         compose.onNodeWithText("60分").performClick()
         compose.onNodeWithTag("task-dialog-confirm").performClick()
+        // Dialog disposal and the system IME animate independently of Compose idling.
+        closeSoftKeyboard()
 
-        compose.onNodeWithTag("study-plan-list").performScrollToNode(hasText("手动测试任务"))
-        compose.onNodeWithText("手动测试任务").assertIsDisplayed()
-        compose.onAllNodesWithText("删除任务").onFirst().performClick()
+        compose.onNodeWithTag("study-plan-list").performScrollToNode(hasText(taskTitle))
+        compose.onNodeWithText(taskTitle).assertIsDisplayed()
+        // The success snackbar temporarily covers this card's action row.
+        compose.waitUntil(10_000) {
+            compose.onAllNodesWithText("已添加学习任务").fetchSemanticsNodes().isEmpty()
+        }
+        compose.onNodeWithTag("study-plan-list").performScrollToNode(hasText("删除任务"))
+        compose.onAllNodesWithText("删除任务").onFirst().assertIsDisplayed().performClick()
+        // Wait for the database write before the activity and its ViewModel are torn down.
+        compose.waitUntil(5_000) {
+            compose.onAllNodesWithText(taskTitle).fetchSemanticsNodes().isEmpty()
+        }
     }
 }

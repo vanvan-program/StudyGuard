@@ -46,7 +46,7 @@ import com.focusforceplus.app.study.data.StudyTask
         StudyEvent::class,
         StudySummary::class,
     ],
-    version = 12,
+    version = 13,
     exportSchema = true,
 )
 @TypeConverters(AppTypeConverters::class)

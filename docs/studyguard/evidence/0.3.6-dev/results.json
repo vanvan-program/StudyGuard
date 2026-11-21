@@ -1,0 +1,16 @@
+{
+  "unitTests": 183,
+  "unitTestClasses": 14,
+  "deviceTests": 37,
+  "deviceApi": 36,
+  "deviceClasses": {
+    "com.focusforceplus.app.ExampleInstrumentedTest": 1,
+    "com.focusforceplus.app.study.StudyBlockedUiTest": 1,
+    "com.focusforceplus.app.study.StudyCalendarUiTest": 3,
+    "com.focusforceplus.app.study.StudyPersistenceTest": 22,
+    "com.focusforceplus.app.study.StudyStatisticsUiTest": 2,
+    "com.focusforceplus.app.study.StudyUiTest": 8
+  },
+  "releaseNoInternetPermission": true,
+  "releaseUiFlows": 3
+}

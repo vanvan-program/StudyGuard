@@ -186,7 +186,7 @@ internal fun SettingsPage(
                 )
                 PanelRow(
                     title = "从本地备份恢复",
-                    description = if (session != null) "结束当前学习后才能恢复备份。" else "会覆盖当前学习数据及其关联任务。",
+                    description = if (session != null) "结束当前学习后才能恢复备份。" else "会覆盖当前 StudyGuard 学习数据。",
                     last = true,
                     onClick = if (busy || session != null) null else ({
                         importLauncher.launch(arrayOf("application/json", "text/plain", "application/octet-stream"))
@@ -270,7 +270,7 @@ internal fun SettingsPage(
             title = { Text("覆盖学习数据并恢复？", style = MaterialTheme.typography.headlineMedium, color = colors.ink) },
             text = {
                 Text(
-                    "这会删除当前 StudyGuard 的学习设置、任务、会话、分段、事件和总结，并写入所选备份。原版待办工具中与学习任务无关的数据不会被删除。建议先导出当前数据。文件由所选系统文档提供方读取，应用不自行上传；请确认来源可信。",
+                    "这会用所选备份覆盖当前 StudyGuard 的学习设置、任务、会话、分段、事件和总结。原版待办使用独立备份。建议先导出当前学习数据，并选择可信文件。",
                     style = MaterialTheme.typography.bodyMedium,
                     color = colors.muted,
                 )

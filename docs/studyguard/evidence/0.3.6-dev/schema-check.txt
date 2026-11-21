@@ -1,0 +1,6 @@
+PASS: Room 10->11 SQL matches exported schema for 14 tables.
+PASS: All 8 legacy table structures and sample todo preserved.
+PASS: Foreign keys, indices, nullability, primary keys and defaults match.
+PASS: Room 11->12 task association migration matches exported schema without changing legacy data.
+PASS: Room 12->13 task data, legacy todo isolation, and task ID sequence match expectations.
+Scope: host SQLite verification; Android Room instrumentation NOT executed by this script.

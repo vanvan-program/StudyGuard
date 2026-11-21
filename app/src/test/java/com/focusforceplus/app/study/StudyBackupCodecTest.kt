@@ -1,6 +1,13 @@
 package com.focusforceplus.app.study
 
 import com.focusforceplus.app.study.backup.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import java.security.MessageDigest
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -11,13 +18,7 @@ class StudyBackupCodecTest {
             dailyMinutes = 120, progressPercent = 35, checkMinutes = 30,
             blockedPackages = "game", allowedPackages = "book",
         ),
-        todos = listOf(BackupTodo(
-            id = 7, title = "数学练习", description = "StudyGuard · 数学",
-            priority = 1, isCompleted = false, isRecurring = false,
-            snoozeCount = 0, maxSnoozeCount = 2, rescheduleCount = 0,
-            maxRescheduleCount = 1, createdAt = 1_000,
-        )),
-        tasks = listOf(BackupTask(3, 7, "数学", "2026-11-12", 60, "OFFLINE_RULES")),
+        tasks = listOf(BackupTask(3, "数学练习", "数学", "2026-11-12", 60, "OFFLINE_RULES", true, 1_000, 61_000)),
         sessions = listOf(BackupSession(
             id = "session-a", subject = "数学", mode = "PAPER", targetMs = 3_600_000,
             state = "EARLY_END", startedWall = 1_000, lastWall = 61_000, lastElapsed = 61_000,
@@ -34,7 +35,10 @@ class StudyBackupCodecTest {
 
     @Test fun completeBackupRoundTrips() {
         val source = payload()
-        assertEquals(source, StudyBackupCodec.decode(StudyBackupCodec.encode(source, 100_000, "0.2.0-dev")))
+        val encoded = StudyBackupCodec.encode(source, 100_000, "test")
+        assertEquals(source, StudyBackupCodec.decode(encoded))
+        assertFalse(encoded.contains("\"todos\""))
+        assertFalse(encoded.contains("\"todoId\""))
     }
 
     @Test fun modifiedContentIsRejected() {
@@ -47,14 +51,14 @@ class StudyBackupCodecTest {
     @Test fun incompatibleSchemaIsRejectedBeforeImport() {
         val encoded = StudyBackupCodec.encode(payload(), 100_000, "0.2.0-dev")
         assertThrows(IllegalArgumentException::class.java) {
-            StudyBackupCodec.decode(encoded.replace("\"schemaVersion\": 12", "\"schemaVersion\": 10"))
+            StudyBackupCodec.decode(encoded.replace("\"schemaVersion\": 13", "\"schemaVersion\": 10"))
         }
     }
 
-    @Test fun orphanTaskIsRejected() {
+    @Test fun blankTaskTitleIsRejected() {
         assertThrows(IllegalArgumentException::class.java) {
             StudyBackupCodec.encode(payload().copy(tasks = listOf(
-                BackupTask(3, 999, "数学", "2026-11-12", 60, "OFFLINE_RULES"),
+                payload().tasks.single().copy(title = " "),
             )), 100_000, "0.2.0-dev")
         }
     }
@@ -132,14 +136,9 @@ class StudyBackupCodecTest {
         assertRejected(source.copy(segments = listOf(source.segments.single().copy(startedWall = Long.MAX_VALUE))))
     }
 
-    @Test fun duplicateTodoAssociationIsRejectedBeforeDatabaseWrite() {
+    @Test fun duplicateTaskIdIsRejected() {
         val source = payload()
-        assertRejected(source.copy(tasks = source.tasks + source.tasks.single().copy(id = 4)))
-    }
-
-    @Test fun unlinkedTodoCannotBeImportedAsOrdinaryTodo() {
-        val source = payload()
-        assertRejected(source.copy(todos = source.todos + source.todos.single().copy(id = 8)))
+        assertRejected(source.copy(tasks = source.tasks + source.tasks.single().copy(title = "另一项")))
     }
 
     @Test fun taskLinksRoundTripAndMissingTasksAreRejected() {
@@ -151,10 +150,49 @@ class StudyBackupCodecTest {
     @Test fun actualSchemaElevenBackupRetainsItsOriginalChecksum() {
         val text = javaClass.getResource("/studyguard-schema11-backup.json")!!.readText()
         val restored = StudyBackupCodec.decode(text)
-        assertEquals(11, restored.schemaVersion)
+        assertEquals(13, restored.schemaVersion)
         assertEquals(2, restored.sessions.size)
         assertEquals(1, restored.tasks.size)
+        assertEquals("QAReviewTask", restored.tasks.single().title)
         assertTrue(restored.sessions.all { it.linkedTaskId == null })
+    }
+
+    @Test fun schemaTwelveBackupPreservesLinkedTaskCompletionAndChecksum() {
+        val text = javaClass.getResource("/studyguard-schema12-backup.json")!!.readText()
+        val restored = StudyBackupCodec.decode(text)
+        val task = restored.tasks.single()
+        assertEquals(13, restored.schemaVersion)
+        assertEquals("旧版已完成学习任务", task.title)
+        assertTrue(task.isCompleted)
+        assertEquals(1_000L, task.createdAt)
+        assertEquals(61_000L, task.completedAt)
+        assertEquals(task.id, restored.sessions.single().linkedTaskId)
+        assertThrows(IllegalArgumentException::class.java) {
+            StudyBackupCodec.decode(text.replace("旧版已完成学习任务", "篡改标题"))
+        }
+    }
+
+    @Test fun legacyBackupsWithMissingExtraOrDuplicateTodoLinksAreRejected() {
+        val json = Json { encodeDefaults = true }
+        val original = json.parseToJsonElement(javaClass.getResource("/studyguard-schema12-backup.json")!!.readText()).jsonObject
+        val payload = original.getValue("payload").jsonObject
+        val todos = payload.getValue("todos").jsonArray
+        val task = payload.getValue("tasks").jsonArray.single().jsonObject
+        val invalidPayloads = listOf(
+            JsonObject(payload + ("todos" to JsonArray(emptyList()))),
+            JsonObject(payload + ("todos" to JsonArray(todos + JsonObject(todos.single().jsonObject + ("id" to JsonPrimitive(43)))))),
+            JsonObject(payload + ("tasks" to JsonArray(listOf(task, JsonObject(task + ("id" to JsonPrimitive(8))))))),
+        )
+        for (invalid in invalidPayloads) {
+            val canonical = json.encodeToString(JsonObject.serializer(), invalid)
+            val checksum = MessageDigest.getInstance("SHA-256").digest(canonical.toByteArray())
+                .joinToString("") { "%02x".format(it) }
+            val signed = json.encodeToString(JsonObject.serializer(), JsonObject(original + mapOf(
+                "payload" to invalid, "sha256" to JsonPrimitive(checksum),
+            )))
+            val error = assertThrows(IllegalArgumentException::class.java) { StudyBackupCodec.decode(signed) }
+            assertTrue(error.message == "备份学习任务与旧待办的关联不完整" || error.message == "多个学习任务关联同一待办")
+        }
     }
 
     @Test fun everyActiveStateRestoresAsEndedAndLeavesEndedRecordsUnchanged() {
