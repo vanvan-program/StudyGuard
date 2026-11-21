@@ -42,6 +42,7 @@ import java.time.LocalDate
 internal fun PlanPage(viewModel: StudyViewModel, onStudy: (StudyTask) -> Unit) {
     val stored by viewModel.profile.collectAsState()
     val draft by viewModel.draft.collectAsState()
+    val generatedFor by viewModel.generatedFor.collectAsState()
     val tasks by viewModel.tasks.collectAsState()
     val taskTimes by viewModel.taskStudyTimes.collectAsState()
     val session by viewModel.runtime.current.collectAsState()
@@ -62,6 +63,9 @@ internal fun PlanPage(viewModel: StudyViewModel, onStudy: (StudyTask) -> Unit) {
     var showExamPicker by rememberSaveable { mutableStateOf(false) }
     var showFilterPicker by rememberSaveable { mutableStateOf(false) }
     val today = LocalDate.now()
+    val inputs = profile.copy(goal = goal, subjects = subjects, examDay = exam,
+        dailyMinutes = daily.toIntOrNull() ?: 0, progressPercent = progressPercent.toIntOrNull() ?: -1)
+    val currentDraft = generatedFor?.samePlanAs(inputs) == true
     val parsedExam = parseStudyDate(exam)
     val examError = when {
         exam.isNotBlank() && parsedExam == null -> "请选择有效日期"
@@ -126,17 +130,7 @@ internal fun PlanPage(viewModel: StudyViewModel, onStudy: (StudyTask) -> Unit) {
                 StudyPrimaryButton(
                     text = if (busy) "正在生成" else "生成本地计划草案",
                     enabled = !busy && examError == null,
-                    onClick = {
-                        viewModel.generate(
-                            profile.copy(
-                                goal = goal,
-                                subjects = subjects,
-                                examDay = exam,
-                                dailyMinutes = daily.toIntOrNull() ?: 0,
-                                progressPercent = progressPercent.toIntOrNull() ?: -1,
-                            ),
-                        )
-                    },
+                    onClick = { viewModel.generate(inputs) },
                     modifier = Modifier.padding(top = 14.dp),
                 )
             }
@@ -148,7 +142,8 @@ internal fun PlanPage(viewModel: StudyViewModel, onStudy: (StudyTask) -> Unit) {
                     .count { (it.day to it.subject) !in existingDaySubjects }
                 val skippedCount = draft.size - addableCount
                 StudyPanel {
-                    Text("待确认草案 · ${draft.size} 项", style = MaterialTheme.typography.titleLarge, color = colors.ink)
+                    Text(if (currentDraft) "待确认草案 · ${draft.size} 项" else "上一次生成的草案 · 请按当前输入重新生成",
+                        style = MaterialTheme.typography.titleLarge, color = colors.ink)
                     Text(
                         "已有同日同科安排会保留，不会被覆盖。加入前可点击单条调整或移除。",
                         style = MaterialTheme.typography.bodySmall,
@@ -161,8 +156,8 @@ internal fun PlanPage(viewModel: StudyViewModel, onStudy: (StudyTask) -> Unit) {
                         } else {
                             "加入 $addableCount 项新任务（跳过 $skippedCount 项重复）"
                         },
-                        onClick = viewModel::acceptDraft,
-                        enabled = addableCount > 0,
+                        onClick = { viewModel.acceptDraft(inputs) },
+                        enabled = currentDraft && !busy && addableCount > 0,
                         modifier = Modifier.padding(top = 12.dp),
                     )
                     StudyTextAction("丢弃草案", { viewModel.draft.value = emptyList() }, tone = StudyTone.Neutral)

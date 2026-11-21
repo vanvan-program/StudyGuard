@@ -43,6 +43,7 @@ object DatabaseModule {
             com.focusforceplus.app.study.data.StudyMigration,
             com.focusforceplus.app.study.data.StudyTaskLinkMigration,
             com.focusforceplus.app.study.data.StudyTaskIsolationMigration,
+            com.focusforceplus.app.study.data.StudyExemptionMigration,
         )
         .build()
 

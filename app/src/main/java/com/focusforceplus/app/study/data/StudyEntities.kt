@@ -17,6 +17,7 @@ data class StudyProfile(
     val checkMinutes: Int = 30,
     val blockedPackages: String = "",
     val allowedPackages: String = "",
+    @ColumnInfo(defaultValue = "''") val exemptPackages: String = "",
 )
 
 @Entity(tableName = "study_tasks", indices = [Index("day")])

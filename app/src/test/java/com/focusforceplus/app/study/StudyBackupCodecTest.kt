@@ -41,6 +41,20 @@ class StudyBackupCodecTest {
         assertFalse(encoded.contains("\"todoId\""))
     }
 
+    @Test fun previewVerifiesOldChecksumBeforeMovingMixedSelectionToExemptions() {
+        val original = Json.parseToJsonElement(StudyBackupCodec.encode(payload(), 100_000, "old")).jsonObject
+        val data = JsonObject(original.getValue("payload").jsonObject + ("schemaVersion" to JsonPrimitive(13)))
+        val checksum = MessageDigest.getInstance("SHA-256").digest(data.toString().toByteArray())
+            .joinToString("") { "%02x".format(it) }
+        val text = JsonObject(original + mapOf("payload" to data, "sha256" to JsonPrimitive(checksum))).toString()
+        val preview = StudyBackupCodec.inspect(text)
+        assertEquals(100_000L, preview.exportedWall)
+        assertEquals("book", preview.payload.profile!!.exemptPackages)
+        assertEquals("", preview.payload.profile!!.allowedPackages)
+        assertEquals("book", preview.payload.sessions.single().allowedPackages)
+        assertThrows(IllegalArgumentException::class.java) { StudyBackupCodec.inspect(text.replace("book", "chat")) }
+    }
+
     @Test fun modifiedContentIsRejected() {
         val encoded = StudyBackupCodec.encode(payload(), 100_000, "0.2.0-dev")
         assertThrows(IllegalArgumentException::class.java) {
@@ -51,7 +65,7 @@ class StudyBackupCodecTest {
     @Test fun incompatibleSchemaIsRejectedBeforeImport() {
         val encoded = StudyBackupCodec.encode(payload(), 100_000, "0.2.0-dev")
         assertThrows(IllegalArgumentException::class.java) {
-            StudyBackupCodec.decode(encoded.replace("\"schemaVersion\": 13", "\"schemaVersion\": 10"))
+            StudyBackupCodec.decode(encoded.replace("\"schemaVersion\": 14", "\"schemaVersion\": 10"))
         }
     }
 
@@ -150,7 +164,7 @@ class StudyBackupCodecTest {
     @Test fun actualSchemaElevenBackupRetainsItsOriginalChecksum() {
         val text = javaClass.getResource("/studyguard-schema11-backup.json")!!.readText()
         val restored = StudyBackupCodec.decode(text)
-        assertEquals(13, restored.schemaVersion)
+        assertEquals(14, restored.schemaVersion)
         assertEquals(2, restored.sessions.size)
         assertEquals(1, restored.tasks.size)
         assertEquals("QAReviewTask", restored.tasks.single().title)
@@ -161,7 +175,7 @@ class StudyBackupCodecTest {
         val text = javaClass.getResource("/studyguard-schema12-backup.json")!!.readText()
         val restored = StudyBackupCodec.decode(text)
         val task = restored.tasks.single()
-        assertEquals(13, restored.schemaVersion)
+        assertEquals(14, restored.schemaVersion)
         assertEquals("旧版已完成学习任务", task.title)
         assertTrue(task.isCompleted)
         assertEquals(1_000L, task.createdAt)

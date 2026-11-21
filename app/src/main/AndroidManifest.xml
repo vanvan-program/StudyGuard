@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
     <!-- ── Notification & alarm permissions ──────────────────────────────── -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
@@ -310,6 +313,11 @@
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="Runs the user-started focus session countdown and restores Do Not Disturb when it ends." />
         </service>
+
+        <provider android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.studyupdates" android:exported="false" android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/study_update_paths" />
+        </provider>
 
         <!-- Fires at a focus session's scheduled time (reminder, no auto-start) -->
         <receiver

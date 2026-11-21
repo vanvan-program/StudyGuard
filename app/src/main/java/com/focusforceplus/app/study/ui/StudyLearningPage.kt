@@ -48,8 +48,8 @@ internal data class StudyStartDraft(
     companion object {
         fun forTask(task: StudyTask, creditedMs: Long): StudyStartDraft {
             val remaining = (task.plannedMinutes * 60_000L - creditedMs).coerceAtLeast(0)
-            val minutes = if (remaining > 0) (remaining + 59_999) / 60_000 else task.plannedMinutes.toLong()
-            return StudyStartDraft(task.subject, minutes.toString(), task.id)
+            val minutes = if (remaining > 0) ((remaining + 59_999) / 60_000).toString() else ""
+            return StudyStartDraft(task.subject, minutes, task.id)
         }
     }
 }
@@ -83,8 +83,8 @@ internal fun LearningPage(
     var progress by rememberSaveable { mutableStateOf("") }
 
     val current = session
-    val selectedCount = packageSet(profile?.blockedPackages.orEmpty()).size
-    val exemptCount = packageSet(profile?.allowedPackages.orEmpty()).size
+    val selectedCount = packageSet(current?.blockedPackages ?: profile?.blockedPackages.orEmpty()).size
+    val learningCount = packageSet(current?.allowedPackages ?: profile?.allowedPackages.orEmpty()).size
     val todayPendingTasks = remember(tasks, todayStr) {
         tasks.filter { it.day == todayStr && !it.isCompleted }
     }
@@ -96,6 +96,7 @@ internal fun LearningPage(
         )
     }
     val selectedTask = draft.taskId?.let { id -> tasks.firstOrNull { it.id == id && !it.isCompleted } }
+    val addingTime = selectedTask != null && (taskTimes[selectedTask.id] ?: 0L) >= selectedTask.plannedMinutes * 60_000L
 
     PageList(state = listState, modifier = Modifier.testTag("study-learning-list")) {
         item {
@@ -141,7 +142,7 @@ internal fun LearningPage(
                 }
                 Text(
                     "已选择 $selectedCount 个受限应用" +
-                        (if (exemptCount > 0) "、$exemptCount 个不受限" else "") +
+                        "、$learningCount 个计时学习应用" +
                         "；结束或紧急退出后解除本次限制。",
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.muted,
@@ -222,7 +223,7 @@ internal fun LearningPage(
                     Spacer(Modifier.height(10.dp))
                     StudyField(
                         value = minutes,
-                        label = "目标有效学习时长（分钟，1–720）",
+                        label = if (addingTime) "已学满，追加多少分钟？" else "目标有效学习时长（分钟，1–720）",
                         onChange = { onDraftChange(draft.copy(minutes = it.take(3))) },
                         numeric = true,
                         error = if (minutes.isNotBlank() && minutes.toIntOrNull() !in 1..720) "请输入1–720分钟" else null,
@@ -233,7 +234,7 @@ internal fun LearningPage(
                         contentPadding = PaddingValues(top = 8.dp),
                         modifier = Modifier.fillMaxWidth().testTag("study-duration-presets"),
                     ) {
-                        items(StudyDurationPresets, key = { it }) { preset ->
+                        items(if (addingTime) listOf(5, 10, 15) else StudyDurationPresets, key = { it }) { preset ->
                             StudyQuickChip(
                                 label = "${preset}分钟",
                                 selected = minutes.trim() == preset.toString(),
@@ -242,6 +243,10 @@ internal fun LearningPage(
                         }
                     }
                     if (selectedTask != null) {
+                        if (addingTime) StudyTextAction("直接标记任务完成", {
+                            viewModel.markComplete(selectedTask)
+                            onDraftChange(StudyStartDraft())
+                        })
                         Row(
                             modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                             verticalAlignment = Alignment.CenterVertically,

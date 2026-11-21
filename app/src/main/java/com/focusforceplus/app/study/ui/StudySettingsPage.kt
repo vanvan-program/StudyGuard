@@ -83,12 +83,12 @@ internal fun SettingsPage(
     var check by rememberSaveable(stored?.checkMinutes) { mutableStateOf(profile.checkMinutes.toString()) }
     var choosing by rememberSaveable { mutableStateOf<String?>(null) }
     var accessibilityDisclosure by rememberSaveable { mutableStateOf(false) }
-    var pendingRestore by rememberSaveable { mutableStateOf<Uri?>(null) }
+    val pendingRestore by viewModel.restorePreview.collectAsState()
     val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
         uri?.let(viewModel::exportBackup)
     }
     val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        pendingRestore = uri
+        uri?.let(viewModel::previewBackup)
     }
 
     LaunchedEffect(Unit) {
@@ -137,14 +137,13 @@ internal fun SettingsPage(
                 PanelRow(
                     title = "受限娱乐应用",
                     description = "受限 ${packageSet(profile.blockedPackages).size} 个 · 不受限 " +
-                        "${packageSet(profile.allowedPackages).size} 个。学习期间限制打开，结束后自动解除；" +
+                        "${packageSet(profile.exemptPackages).size} 个。仅放行的应用不累计手机学习时间。" +
                         "下次开始学习时生效。",
                     onClick = { choosing = "BLOCKED" },
                 )
                 PanelRow(
                     title = "允许的学习应用",
-                    description = "不受限 ${packageSet(profile.allowedPackages).size} 个。白名单优先于娱乐限制；" +
-                        "通信、桌面、权限与系统设置始终放行。",
+                    description = "计时学习应用 ${packageSet(profile.allowedPackages).size} 个。请选择题库、教材等需要计时的应用。旧版混合名单升级后仅放行，需重新勾选学习应用。",
                     last = true,
                     onClick = { choosing = "ALLOWED" },
                 )
@@ -167,6 +166,7 @@ internal fun SettingsPage(
                 )
             }
         }
+        item { StudyUpdatePanel(sessionActive = session != null) }
         item { GroupLabel("数据与 AI") }
         item {
             StudyPanel(contentPadding = PaddingValues(0.dp)) {
@@ -197,7 +197,7 @@ internal fun SettingsPage(
         item {
             StudyPanel {
                 Text(
-                    "当前版本不联网，数据保存在本机，系统自动备份已关闭。卸载会删除本应用数据。",
+                    "学习数据保存在本机。仅手动检查和下载更新时访问更新源。卸载会删除本应用数据。",
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.muted,
                 )
@@ -262,25 +262,29 @@ internal fun SettingsPage(
             TextButton(onClick = { accessibilityDisclosure = false }) { Text("暂不开启", color = colors.muted) }
         },
     )
-    pendingRestore?.let { uri ->
+    pendingRestore?.let { preview ->
         AlertDialog(
-            onDismissRequest = { pendingRestore = null },
+            onDismissRequest = { viewModel.restorePreview.value = null },
             containerColor = colors.surface,
             shape = RoundedCornerShape(12.dp),
             title = { Text("覆盖学习数据并恢复？", style = MaterialTheme.typography.headlineMedium, color = colors.ink) },
             text = {
                 Text(
-                    "这会用所选备份覆盖当前 StudyGuard 的学习设置、任务、会话、分段、事件和总结。原版待办使用独立备份。建议先导出当前学习数据，并选择可信文件。",
+                    "备份日期 " + java.time.Instant.ofEpochMilli(preview.backup.exportedWall)
+                        .atZone(java.time.ZoneId.systemDefault()).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) +
+                        "\n备份：${preview.backup.payload.tasks.size} 项任务 · ${com.focusforceplus.app.study.core.studyDurationLabel(preview.backupMs)}" +
+                        "\n本机：${preview.localTasks} 项任务 · ${com.focusforceplus.app.study.core.studyDurationLabel(preview.localMs)}" +
+                        "\n确认后会覆盖本机学习设置、任务和全部学习记录。",
                     style = MaterialTheme.typography.bodyMedium,
                     color = colors.muted,
                 )
             },
             confirmButton = {
-                TextButton(onClick = { pendingRestore = null; viewModel.restoreBackup(uri) }) {
+                TextButton(onClick = viewModel::confirmRestore) {
                     Text("确认覆盖并恢复", color = colors.danger)
                 }
             },
-            dismissButton = { TextButton(onClick = { pendingRestore = null }) { Text("取消", color = colors.muted) } },
+            dismissButton = { TextButton(onClick = { viewModel.restorePreview.value = null }) { Text("取消", color = colors.muted) } },
         )
     }
     choosing?.let { kind ->
@@ -290,7 +294,7 @@ internal fun SettingsPage(
             apps = apps,
             loading = appsLoading,
             initial = if (kind == "BLOCKED") blocked else allowed,
-            exempt = if (kind == "BLOCKED") allowed else null,
+            exempt = if (kind == "BLOCKED") packageSet(profile.exemptPackages) else null,
             title = if (kind == "BLOCKED") "受限娱乐应用" else "允许的学习应用",
             loadIcon = viewModel::loadAppIcon,
             onDismiss = { choosing = null },
@@ -298,12 +302,14 @@ internal fun SettingsPage(
                 val next = if (kind == "BLOCKED") {
                     profile.copy(
                         blockedPackages = (selectedSet - exemptSet).sorted().joinToString(","),
-                        allowedPackages = exemptSet.sorted().joinToString(","),
+                        exemptPackages = exemptSet.sorted().joinToString(","),
+                        allowedPackages = (allowed - selectedSet - exemptSet).sorted().joinToString(","),
                     )
                 } else {
                     profile.copy(
                         blockedPackages = (blocked - selectedSet).sorted().joinToString(","),
                         allowedPackages = selectedSet.sorted().joinToString(","),
+                        exemptPackages = (packageSet(profile.exemptPackages) - selectedSet).sorted().joinToString(","),
                     )
                 }
                 viewModel.saveProfile(next.copy(examDay = next.examDay.ifBlank { LocalDate.now().plusDays(30).toString() }))

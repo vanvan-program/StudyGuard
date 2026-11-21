@@ -10,6 +10,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.focusforceplus.app.study.ai.PlannedTask
 import com.focusforceplus.app.study.backup.StudyBackupCodec
+import com.focusforceplus.app.study.backup.VerifiedStudyBackup
+import androidx.room.withTransaction
 import com.focusforceplus.app.study.core.StatisticsFilter
 import com.focusforceplus.app.study.core.StatisticsSegment
 import com.focusforceplus.app.study.core.StatisticsTask
@@ -87,6 +89,8 @@ class StudyViewModel @Inject constructor(
     val apps = MutableStateFlow<List<InstalledApp>>(emptyList())
     val appsLoading = MutableStateFlow(false)
     val draft = MutableStateFlow<List<PlannedTask>>(emptyList())
+    val generatedFor = MutableStateFlow<StudyProfile?>(null)
+    val restorePreview = MutableStateFlow<RestorePreview?>(null)
     val busy = MutableStateFlow(false)
     val message = MutableStateFlow<String?>(null)
     val usageGranted = MutableStateFlow(runtime.hasUsageAccess())
@@ -167,16 +171,20 @@ class StudyViewModel @Inject constructor(
     fun generate(profile: StudyProfile) {
         if (busy.value) return
         busy.value = true
+        generatedFor.value = null
         action {
             try {
+                val tasks = repository.ai.plan(profile, LocalDate.now())
                 repository.saveProfile(profile)
-                draft.value = repository.ai.plan(profile, LocalDate.now())
+                draft.value = tasks
+                generatedFor.value = profile
                 message.value = "已生成本地规则草案，请检查后加入任务"
             } finally { busy.value = false }
         }
     }
 
-    fun acceptDraft() = action {
+    fun acceptDraft(inputs: StudyProfile) = action {
+        require(!busy.value && generatedFor.value?.samePlanAs(inputs) == true) { "请按当前输入重新生成草案" }
         val added = repository.acceptPlan(draft.value)
         draft.value = emptyList()
         message.value = "已加入 $added 项任务；已有同日同科任务已保留"
@@ -185,6 +193,7 @@ class StudyViewModel @Inject constructor(
     suspend fun loadAppIcon(packageName: String): Drawable? = installedApps.loadIcon(packageName)
 
     fun toggleTask(row: StudyTask) = action { repository.toggleTask(row.id) }
+    fun markComplete(row: StudyTask) = action { repository.completeTask(row.id) }
     fun deleteTask(row: StudyTask) = action { repository.deleteTask(row.id) }
     fun addTask(title: String, subject: String, day: String, minutes: String, onAdded: () -> Unit = {}) = action {
         repository.addTask(title, subject, day, minutes.toIntOrNull() ?: error("请输入有效分钟数"))
@@ -296,13 +305,14 @@ class StudyViewModel @Inject constructor(
         }
     }
 
-    fun restoreBackup(uri: Uri) {
+    fun previewBackup(uri: Uri) {
         if (busy.value) return
         if (runtime.current.value != null || runtime.serviceAlive) {
             message.value = "请先结束当前学习，再恢复备份"
             return
         }
         busy.value = true
+        restorePreview.value = null
         action {
             try {
                 val text = withContext(Dispatchers.IO) {
@@ -320,7 +330,24 @@ class StudyViewModel @Inject constructor(
                         output.toString(Charsets.UTF_8.name())
                     } ?: error("无法读取所选文件")
                 }
-                val summary = withContext(Dispatchers.Default) { repository.restoreBackup(text) }
+                val backup = withContext(Dispatchers.Default) { StudyBackupCodec.inspect(text) }
+                restorePreview.value = repository.database.withTransaction {
+                    RestorePreview(backup, repository.dao.taskCount(), repository.dao.totalStudyMs())
+                }
+            } finally { busy.value = false }
+        }
+    }
+
+    fun confirmRestore() {
+        val preview = restorePreview.value ?: return
+        if (busy.value) return
+        busy.value = true
+        restorePreview.value = null
+        action {
+            try {
+                val summary = withContext(Dispatchers.Default) { repository.restoreBackup(preview.backup.payload) }
+                draft.value = emptyList()
+                generatedFor.value = null
                 message.value = "恢复完成：${summary.tasks} 个学习任务、${summary.sessions} 次会话、" +
                     "${summary.segments} 个有效分段、${summary.events} 条事件、${summary.summaries} 份总结"
             } finally {
@@ -329,6 +356,13 @@ class StudyViewModel @Inject constructor(
         }
     }
 }
+
+data class RestorePreview(val backup: VerifiedStudyBackup, val localTasks: Int, val localMs: Long) {
+    val backupMs = backup.payload.segments.sumOf { it.durationMs }
+}
+
+internal fun StudyProfile.samePlanAs(other: StudyProfile) = goal == other.goal && subjects == other.subjects &&
+    examDay == other.examDay && dailyMinutes == other.dailyMinutes && progressPercent == other.progressPercent
 
 private data class StatisticsSource(
     val segments: List<com.focusforceplus.app.study.data.StudySegment>,

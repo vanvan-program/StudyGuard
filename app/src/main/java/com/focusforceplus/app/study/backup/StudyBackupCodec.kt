@@ -40,6 +40,9 @@ data class BackupProfile(
     val checkMinutes: Int,
     val blockedPackages: String,
     val allowedPackages: String,
+    @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
+    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER)
+    val exemptPackages: String = "",
 )
 
 @Serializable
@@ -157,10 +160,12 @@ data class StudyBackupSummary(
     val summaries: Int,
 )
 
+data class VerifiedStudyBackup(val payload: StudyBackupPayload, val exportedWall: Long, val appVersion: String)
+
 object StudyBackupCodec {
     const val FORMAT = "StudyGuardBackup"
     const val FORMAT_VERSION = 1
-    const val SCHEMA_VERSION = 13
+    const val SCHEMA_VERSION = 14
     const val MAX_BYTES = 25 * 1024 * 1024
     private val activeStates = setOf("RUNNING", "PAUSED", "INTERRUPTED")
     private val endedStates = setOf("COMPLETED", "EARLY_END", "EMERGENCY_END")
@@ -182,7 +187,9 @@ object StudyBackupCodec {
         )
     }
 
-    fun decode(text: String): StudyBackupPayload {
+    fun decode(text: String): StudyBackupPayload = inspect(text).payload
+
+    fun inspect(text: String): VerifiedStudyBackup {
         require(text.toByteArray(Charsets.UTF_8).size <= MAX_BYTES) { "备份文件超过 25 MB 限制" }
         val envelope = parseBackup {
             // Keep the typed field order for checksum verification, including for old backups.
@@ -191,12 +198,12 @@ object StudyBackupCodec {
         require(envelope.format == FORMAT) { "备份格式标记不匹配" }
         require(envelope.formatVersion == FORMAT_VERSION) { "不支持的备份格式版本" }
         val payload = when ((envelope.payload["schemaVersion"] as? JsonPrimitive)?.intOrNull) {
-            SCHEMA_VERSION -> {
+            13, SCHEMA_VERSION -> {
                 val current = parseBackup {
                     compact.decodeFromJsonElement(StudyBackupPayload.serializer(), envelope.payload)
                 }
                 verifyChecksum(compact.encodeToString(StudyBackupPayload.serializer(), current), envelope.sha256)
-                current
+                if (current.schemaVersion == 13) current.copy(schemaVersion = SCHEMA_VERSION, profile = current.profile?.migrateExemptions()) else current
             }
             11, 12 -> {
                 val legacy = parseBackup {
@@ -208,8 +215,10 @@ object StudyBackupCodec {
             else -> throw IllegalArgumentException("备份数据库版本不兼容")
         }
         validate(payload)
-        return payload
+        return VerifiedStudyBackup(payload, envelope.exportedWall, envelope.appVersion)
     }
+
+    private fun BackupProfile.migrateExemptions() = copy(exemptPackages = allowedPackages, allowedPackages = "")
 
     private inline fun <T> parseBackup(read: () -> T): T = try {
         read()
@@ -230,7 +239,7 @@ object StudyBackupCodec {
         require(linkedTodoIds.size == tasks.size) { "多个学习任务关联同一待办" }
         require(todosById.keys == linkedTodoIds) { "备份学习任务与旧待办的关联不完整" }
         return StudyBackupPayload(
-            profile = profile,
+            profile = profile?.migrateExemptions(),
             tasks = tasks.map { task ->
                 val todo = todosById.getValue(task.todoId)
                 BackupTask(

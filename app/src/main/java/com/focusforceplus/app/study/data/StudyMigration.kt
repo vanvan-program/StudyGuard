@@ -32,6 +32,14 @@ object StudyTaskLinkMigration : Migration(11, 12) {
     }
 }
 
+object StudyExemptionMigration : Migration(13, 14) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE study_profile ADD COLUMN exemptPackages TEXT NOT NULL DEFAULT ''")
+        // Old selections did not distinguish exemptions from explicit learning apps.
+        db.execSQL("UPDATE study_profile SET exemptPackages = allowedPackages, allowedPackages = ''")
+    }
+}
+
 object StudyTaskIsolationMigration : Migration(12, 13) {
     override fun migrate(db: SupportSQLiteDatabase) {
         statements.forEach(db::execSQL)

@@ -11,7 +11,7 @@
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.2.10%20%7C%20Compose-7F52FF?style=flat-square)](#技术栈与从源码构建)
 [![License](https://img.shields.io/badge/License-GPLv3-blue?style=flat-square)](LICENSE)
 
-[下载安装包（v0.3.7-dev）](https://github.com/vanvan-program/StudyGuard/releases/tag/v0.3.7-dev) · [使用与安装指南](docs/studyguard/使用与安装指南.md) · [更新日志](CHANGES_STUDYGUARD.md) · [验证报告](docs/studyguard/VALIDATION-0.3.7-dev.md) · [隐私政策](PRIVACY.md) · [问题反馈](https://github.com/vanvan-program/StudyGuard/issues)
+[下载安装包（v0.3.8）](https://github.com/vanvan-program/StudyGuard/releases/tag/v0.3.8) · [使用与安装指南](docs/studyguard/使用与安装指南.md) · [更新日志](CHANGES_STUDYGUARD.md) · [验证报告](docs/studyguard/VALIDATION-0.3.8.md) · [隐私政策](PRIVACY.md) · [问题反馈](https://github.com/vanvan-program/StudyGuard/issues)
 
 </div>
 
@@ -19,10 +19,10 @@
 
 ## 项目定位
 
-StudyGuard 将**学习任务计划、专注计时、应用使用提醒与学习统计**整合在一款原生 Android 应用中。支持**纸书学习**与**手机学习**双模式，数据默认保存在本机，**无账号、无广告、不申请联网权限**。
+StudyGuard 将**学习任务计划、专注计时、应用使用提醒与学习统计**整合在一款原生 Android 应用中。支持**纸书学习**与**手机学习**双模式，数据默认保存在本机，**无账号、无广告，学习功能可离线使用**。
 
 > [!NOTE]
-> 当前开发预览版为 **0.3.7-dev**，支持 Android 8.0 及以上。计划与总结使用本地规则。Android 16 官方模拟器已验证 45 分钟锁屏计时，厂商真机的耗电和后台行为仍待实测。
+> 当前正式版为 **0.3.8**，支持 Android 8.0 及以上。计划与总结使用本地规则。0.3.7-dev 在 Android 16 官方模拟器已验证 45 分钟锁屏计时，厂商真机的耗电和后台行为仍待实测。
 
 ## 核心功能
 
@@ -38,9 +38,10 @@ StudyGuard 将**学习任务计划、专注计时、应用使用提醒与学习�
 
 ## 安装与更新
 
-1. 前往 [GitHub Releases](https://github.com/vanvan-program/StudyGuard/releases) 下载 `StudyGuard-0.3.7-dev-release.apk`（`debug` 与 `androidTest` 包仅用于开发测试，日常试用请选择 `release`）。
+1. 前往 [GitHub Releases](https://github.com/vanvan-program/StudyGuard/releases) 下载 `StudyGuard-0.3.8-release.apk`（`debug` 与 `androidTest` 包仅用于开发测试，日常试用请选择 `release`）。
 2. 在手机文件管理器中打开 APK，按系统提示授权并安装。
 3. 应用包名为 `io.studyguard.app`，**不会覆盖上游 FocusForcePlus**。本版沿用 StudyGuard 开发证书，可直接覆盖同签名旧开发版；证书与安装包校验值见验证报告与 Release 中的 `SHA256SUMS.txt`。自行构建的包签名不同，升级前请先在设置中导出备份。
+4. 从 0.3.8 起，可在「设置 → 应用更新」检查、下载并通过系统安装器更新。默认自动换源，也可指定 GitHub 官方、gh-proxy.com 或 ghfast.top。旧版需先手动覆盖安装一次。
 
 ## 权限与隐私边界
 
@@ -51,7 +52,7 @@ StudyGuard 将**学习任务计划、专注计时、应用使用提醒与学习�
 | 无障碍服务 | 仅读取窗口包名以增强提醒，**不读取文字、输入或页面内容** | 可选 |
 | 精确闹钟 / 勿扰访问 | 沿用原版工具的可选提醒辅助能力 | 可选 |
 
-- 应用 **未声明 `INTERNET` 权限**，不接入云服务或第三方统计分析 SDK，并排除系统云备份与设备转移。
+- 仅在手动检查或下载更新时联网。学习记录保存在本机，并排除系统云备份与设备转移。
 - 用户主动导出的 JSON 备份文件**未加密**；若保存至云盘目录，可能由对应文档提供方同步。卸载会删除应用内部数据，详见 [隐私政策](PRIVACY.md)。
 
 ## 技术栈与从源码构建
@@ -68,7 +69,7 @@ cd StudyGuard
 - Windows 可使用 `gradlew.bat` 或 `scripts/Build-StudyGuard.ps1`；如遇中文路径编码问题请见 [BUILD-ENCODING.md](docs/studyguard/BUILD-ENCODING.md)。
 - Release 构建启用 R8 与资源收缩；自行签名可通过环境变量配置 `KEYSTORE_FILE`、`KEYSTORE_PASSWORD`、`KEY_ALIAS`、`KEY_PASSWORD`（仓库不含私钥）。
 
-### 当前验证摘要（0.3.7-dev）
+### 上版验证摘要 (0.3.7-dev)
 
 | 验证项 | 结果 |
 | :--- | :--- |

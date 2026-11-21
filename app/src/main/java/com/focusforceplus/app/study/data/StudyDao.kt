@@ -29,6 +29,15 @@ interface StudyDao {
     @Query("SELECT * FROM study_tasks ORDER BY day, id")
     fun tasks(): Flow<List<StudyTask>>
 
+    @Query("SELECT * FROM study_tasks WHERE day = :day")
+    suspend fun tasksOn(day: String): List<StudyTask>
+
+    @Query("SELECT COUNT(*) FROM study_tasks")
+    suspend fun taskCount(): Int
+
+    @Query("SELECT COALESCE(SUM(durationMs), 0) FROM study_segments")
+    suspend fun totalStudyMs(): Long
+
     @Query("SELECT * FROM study_tasks WHERE id = :id")
     suspend fun taskById(id: Long): StudyTask?
 

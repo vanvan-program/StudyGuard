@@ -129,13 +129,13 @@ class StudyUiTest {
         compose.onAllNodesWithText("不受限").onFirst().performClick()
         compose.onNodeWithText("受限 0 个 · 不受限 1 个").assertIsDisplayed()
         compose.onNodeWithText("保存").performClick()
-        compose.onNodeWithText("不受限 1 个。白名单优先于娱乐限制", substring = true).assertIsDisplayed()
+        compose.onNodeWithText("受限 0 个 · 不受限 1 个。仅放行", substring = true).assertIsDisplayed()
 
         // 复原，避免影响其它用例。
         compose.onNodeWithText("受限娱乐应用").performClick()
         compose.onNodeWithText("恢复").performClick()
         compose.onNodeWithText("保存").performClick()
-        compose.onNodeWithText("不受限 0 个。白名单优先于娱乐限制", substring = true).assertIsDisplayed()
+        compose.onNodeWithText("受限 0 个 · 不受限 0 个。仅放行", substring = true).assertIsDisplayed()
     }
 
     private fun advanceSpotlightStep(counterText: String, buttonText: String) {

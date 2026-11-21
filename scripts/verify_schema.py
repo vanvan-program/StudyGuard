@@ -12,6 +12,7 @@ linked_schema = json.loads((schema_dir / "12.json").read_text(encoding="utf-8"))
 isolated_schema = json.loads((schema_dir / "13.json").read_text(encoding="utf-8"))["database"]
 migration_source = (root / "app/src/main/java/com/focusforceplus/app/study/data/StudyMigration.kt").read_text(encoding="utf-8")
 original_migration, isolation_migration = migration_source.split("object StudyTaskIsolationMigration", 1)
+original_migration, exemption_migration = original_migration.split("object StudyExemptionMigration", 1)
 statements = re.findall(r'^\s*"(CREATE [^"]+)"[, ]*$', original_migration, flags=re.MULTILINE)
 assert len(statements) == 14, f"Unexpected migration statements: {len(statements)}"
 
@@ -59,7 +60,7 @@ tables = len(new_schema["entities"])
 print(f"PASS: Room 10->11 SQL matches exported schema for {tables} tables.")
 print(f"PASS: All {len(before)} legacy table structures and sample todo preserved.")
 print("PASS: Foreign keys, indices, nullability, primary keys and defaults match.")
-link_statements = re.findall(r'\bdb\.execSQL\("(ALTER TABLE [^"]+)"\)', migration_source)
+link_statements = re.findall(r'\bdb\.execSQL\("(ALTER TABLE [^"]+)"\)', original_migration)
 assert len(link_statements) == 1
 for statement in link_statements:
     migrated.execute(statement)
@@ -100,4 +101,16 @@ for statement in isolation_statements:
     empty_tasks.execute(statement)
 assert empty_tasks.execute("SELECT seq FROM sqlite_sequence WHERE name='study_tasks'").fetchone() == (99,)
 print("PASS: Room 12->13 task data, legacy todo isolation, and task ID sequence match expectations.")
+profile = (1, "", "", "", 120, 0, 30, "games", "books,chat")
+migrated.execute("INSERT INTO study_profile VALUES (?,?,?,?,?,?,?,?,?)", profile)
+for statement in re.findall(r'db\.execSQL\("([^"]+)"\)', exemption_migration):
+    migrated.execute(statement)
+assert migrated.execute("SELECT blockedPackages, allowedPackages, exemptPackages FROM study_profile").fetchone() == ("games", "", "books,chat")
+schema14 = json.loads((schema_dir / "14.json").read_text(encoding="utf-8"))["database"]
+expected14 = sqlite3.connect(":memory:")
+create_schema(expected14, schema14)
+for entity in schema14["entities"]:
+    table = entity["tableName"]
+    assert metadata(migrated, table) == metadata(expected14, table), f"v14 schema differs: {table}"
+print("PASS: Room 13->14 preserves mixed allowlist as exemptions and matches exported schema.")
 print("Scope: host SQLite verification; Android Room instrumentation NOT executed by this script.")

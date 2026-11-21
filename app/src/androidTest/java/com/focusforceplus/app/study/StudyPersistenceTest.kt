@@ -125,10 +125,10 @@ class StudyPersistenceTest {
             original.execSQL("INSERT INTO todos (id,title,priority,isCompleted,isRecurring,snoozeCount,maxSnoozeCount,rescheduleCount,maxRescheduleCount,createdAt) VALUES (42,'保留旧任务',1,0,0,0,2,0,1,1000)")
         }
         val migrated = Room.databaseBuilder(context, AppDatabase::class.java, name)
-            .addMigrations(StudyMigration, StudyTaskLinkMigration, StudyTaskIsolationMigration).build()
+            .addMigrations(StudyMigration, StudyTaskLinkMigration, StudyTaskIsolationMigration, StudyExemptionMigration).build()
         try {
             assertEquals("保留旧任务", migrated.todoDao().getById(42)?.title)
-            assertEquals(13, migrated.openHelper.writableDatabase.version)
+            assertEquals(14, migrated.openHelper.writableDatabase.version)
             migrated.studyDao().saveProfile(StudyProfile(goal = "升级后可写入", examDay = "2026-12-10"))
             assertEquals("升级后可写入", migrated.studyDao().profileOnce()?.goal)
         } finally {
@@ -334,6 +334,51 @@ class StudyPersistenceTest {
         } finally { database.close() }
     }
 
+    @Test fun reviewingOrReopeningAnOverdueTaskRefreshesItsPlannedDay() = runBlocking {
+        val database = memoryDatabase()
+        try {
+            val repository = StudyRepository(database, StudyRuntime(context), OfflineStudyAiProvider())
+            val day = java.time.LocalDate.now().minusDays(4)
+            val id = repository.addTask("补做练习", "数学", day.toString(), 20)
+            repository.createSummary(day)
+            suspend fun summary() = repository.dao.summariesOnce().single { it.day == day.toString() }.content
+            assertTrue(summary().contains("任务 0/1"))
+            repository.completeTask(id)
+            assertTrue(summary().contains("任务 1/1"))
+            repository.toggleTask(id)
+            assertTrue(summary().contains("任务 0/1"))
+        } finally { database.close() }
+    }
+
+    @Test fun invalidPlanLeavesStoredInputsAndBlocksPreviousDraft() = runBlocking {
+        val database = memoryDatabase()
+        val store = androidx.lifecycle.ViewModelStore()
+        try {
+            val runtime = StudyRuntime(context)
+            val repository = StudyRepository(database, runtime, OfflineStudyAiProvider())
+            lateinit var model: StudyViewModel
+            val valid = StudyProfile(goal = "复习", subjects = "数学", examDay = java.time.LocalDate.now().toString())
+            val main = InstrumentationRegistry.getInstrumentation()
+            main.runOnMainSync {
+                model = StudyViewModel(context, repository, runtime, InstalledAppsHelper(context))
+                store.put("plan", model)
+                model.generate(valid)
+            }
+            withTimeout(5000) { model.busy.first { !it } }
+            assertEquals(valid, model.generatedFor.value)
+            main.runOnMainSync { model.generate(valid.copy(goal = "")) }
+            withTimeout(5000) { model.busy.first { !it } }
+            assertEquals(valid, repository.dao.profileOnce())
+            assertNull(model.generatedFor.value)
+            main.runOnMainSync { model.acceptDraft(valid) }
+            withTimeout(5000) { model.message.first { it == "请按当前输入重新生成草案" } }
+            assertEquals(0, repository.dao.taskCount())
+        } finally {
+            InstrumentationRegistry.getInstrumentation().runOnMainSync { store.clear() }
+            database.close()
+        }
+    }
+
     @Test fun manualAddTaskAllowsMultipleSameDaySubjectsAndSupportsToggle() = runBlocking {
         val database = memoryDatabase()
         try {
@@ -475,9 +520,9 @@ class StudyPersistenceTest {
             original.execSQL("INSERT INTO study_segments VALUES (1,'old','数学','2026-11-20',1000,1500,'USAGE_EVENTS_ONLY')")
         }
         val migrated = Room.databaseBuilder(context, AppDatabase::class.java, name)
-            .addMigrations(StudyTaskLinkMigration, StudyTaskIsolationMigration).build()
+            .addMigrations(StudyTaskLinkMigration, StudyTaskIsolationMigration, StudyExemptionMigration).build()
         try {
-            assertEquals(13, migrated.openHelper.writableDatabase.version)
+            assertEquals(14, migrated.openHelper.writableDatabase.version)
             assertEquals("保留学习任务", migrated.studyDao().tasksOnce().single().title)
             val existing = migrated.studyDao().currentSession()!!
             assertEquals(1_500L, existing.effectiveMs)
@@ -510,7 +555,7 @@ class StudyPersistenceTest {
             original.execSQL("INSERT INTO study_segments VALUES (1,'old','英语','2026-11-20',1000,1500,'USAGE_EVENTS_ONLY')")
         }
         val migrated = Room.databaseBuilder(context, AppDatabase::class.java, name)
-            .addMigrations(StudyTaskIsolationMigration).build()
+            .addMigrations(StudyTaskIsolationMigration, StudyExemptionMigration).build()
         try {
             val study = migrated.studyDao()
             assertEquals(listOf(
@@ -540,7 +585,7 @@ class StudyPersistenceTest {
             original.execSQL("INSERT INTO study_sessions VALUES ('deleted-task','数学','PAPER',60000,'PAUSED',1000,2500,2500,1500,NULL,'','','',30,0,99)")
         }
         val migrated = Room.databaseBuilder(context, AppDatabase::class.java, name)
-            .addMigrations(StudyTaskIsolationMigration).build()
+            .addMigrations(StudyTaskIsolationMigration, StudyExemptionMigration).build()
         try {
             val repository = StudyRepository(migrated, StudyRuntime(context), OfflineStudyAiProvider())
             val newId = repository.addTask("迁移后的新任务", "数学", "2026-11-21", 30)

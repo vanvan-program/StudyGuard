@@ -11,7 +11,7 @@
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.2.10%20%7C%20Compose-7F52FF?style=flat-square)](#技術棧與從原始碼建置)
 [![License](https://img.shields.io/badge/License-GPLv3-blue?style=flat-square)](LICENSE)
 
-[下載安裝包（v0.3.7-dev）](https://github.com/vanvan-program/StudyGuard/releases/tag/v0.3.7-dev) · [使用與安裝指南](docs/studyguard/使用与安装指南.md) · [更新日誌](CHANGES_STUDYGUARD.md) · [驗證報告](docs/studyguard/VALIDATION-0.3.7-dev.md) · [隱私權政策](PRIVACY.md) · [問題回報](https://github.com/vanvan-program/StudyGuard/issues)
+[下載安裝包（v0.3.8）](https://github.com/vanvan-program/StudyGuard/releases/tag/v0.3.8) · [使用與安裝指南](docs/studyguard/使用与安装指南.md) · [更新日誌](CHANGES_STUDYGUARD.md) · [驗證報告](docs/studyguard/VALIDATION-0.3.8.md) · [隱私權政策](PRIVACY.md) · [問題回報](https://github.com/vanvan-program/StudyGuard/issues)
 
 </div>
 
@@ -19,10 +19,10 @@
 
 ## 專案定位
 
-StudyGuard 將**學習任務計畫、專注計時、應用程式使用提醒與學習統計**整合於一款原生 Android 應用程式中。支援**紙本學習**與**手機學習**雙模式，資料預設儲存於本機，**無帳號、無廣告、不申請網路權限**。
+StudyGuard 將**學習任務計畫、專注計時、應用程式使用提醒與學習統計**整合於一款原生 Android 應用程式中。支援**紙本學習**與**手機學習**雙模式，資料預設儲存於本機，**無帳號、無廣告，學習功能可離線使用**。
 
 > [!NOTE]
-> 目前開發預覽版為 **0.3.7-dev**，支援 Android 8.0 及以上。計畫與總結使用本機規則。Android 16 官方模擬器已驗證 45 分鐘鎖屏計時，各廠商實機的耗電與背景行為仍待實測。
+> 目前正式版為 **0.3.8**，支援 Android 8.0 及以上。計畫與總結使用本機規則。0.3.7-dev 在 Android 16 官方模擬器已驗證 45 分鐘鎖屏計時，各廠商實機的耗電與背景行為仍待實測。
 
 ## 核心功能
 
@@ -38,9 +38,10 @@ StudyGuard 將**學習任務計畫、專注計時、應用程式使用提醒與�
 
 ## 安裝與更新
 
-1. 前往 [GitHub Releases](https://github.com/vanvan-program/StudyGuard/releases) 下載 `StudyGuard-0.3.7-dev-release.apk`（`debug` 與 `androidTest` 封裝僅供開發測試，日常試用請選取 `release`）。
+1. 前往 [GitHub Releases](https://github.com/vanvan-program/StudyGuard/releases) 下載 `StudyGuard-0.3.8-release.apk`（`debug` 與 `androidTest` 封裝僅供開發測試，日常試用請選取 `release`）。
 2. 於手機檔案管理員開啟 APK，依系統提示授權並安裝。
 3. 應用程式套件名稱為 `io.studyguard.app`，**不會覆蓋上游 FocusForcePlus**。本版沿用 StudyGuard 開發簽章，可直接覆蓋同簽章舊開發版；憑證與安裝包雜湊值請見驗證報告與 Release 中的 `SHA256SUMS.txt`。自行建置的版本簽章不同，更新前請先匯出備份。
+4. 從 0.3.8 起，可在「設定 → 應用更新」檢查、下載並透過系統安裝程式更新。預設自動切換來源，也可指定 GitHub 官方、gh-proxy.com 或 ghfast.top。舊版需先手動覆蓋安裝一次。
 
 ## 權限與隱私邊界
 
@@ -51,7 +52,7 @@ StudyGuard 將**學習任務計畫、專注計時、應用程式使用提醒與�
 | 無障礙服務 | 僅讀取視窗套件名稱以強化提醒，**不讀取文字、輸入或頁面內容** | 選用 |
 | 精確鬧鐘 / 勿擾存取 | 保留原版工具的選用提醒輔助功能 | 選用 |
 
-- 應用程式 **未宣告 `INTERNET` 權限**，不接入雲端服務或第三方分析 SDK，並排除系統雲端備份與裝置移轉。
+- 僅在手動檢查或下載更新時連網。學習紀錄儲存於本機，並排除系統雲端備份與裝置移轉。
 - 使用者主動匯出的 JSON 備份檔**未加密**；若儲存至雲端硬碟目錄，可能由該文件提供者同步。解除安裝會刪除應用程式內部資料，詳見 [隱私權政策](PRIVACY.md)。
 
 ## 技術棧與從原始碼建置
@@ -68,7 +69,7 @@ cd StudyGuard
 - Windows 可使用 `gradlew.bat` 或 `scripts/Build-StudyGuard.ps1`；如遇中文路徑編碼問題請見 [BUILD-ENCODING.md](docs/studyguard/BUILD-ENCODING.md)。
 - Release 建置啟用 R8 與資源縮減；自行簽章可透過環境變數設定 `KEYSTORE_FILE`、`KEYSTORE_PASSWORD`、`KEY_ALIAS`、`KEY_PASSWORD`（儲存庫不含私鑰）。
 
-### 目前驗證摘要（0.3.7-dev）
+### 上一版驗證摘要 (0.3.7-dev)
 
 | 驗證項目 | 結果 |
 | :--- | :--- |

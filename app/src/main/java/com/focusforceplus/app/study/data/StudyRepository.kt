@@ -16,6 +16,7 @@ import com.focusforceplus.app.study.backup.StudyBackupCodec
 import com.focusforceplus.app.study.backup.StudyBackupPayload
 import com.focusforceplus.app.study.backup.StudyBackupSummary
 import com.focusforceplus.app.study.core.StudyLedger
+import com.focusforceplus.app.study.core.packageSet
 import com.focusforceplus.app.study.monitor.StudyRuntime
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
@@ -96,7 +97,10 @@ class StudyRepository @Inject constructor(
 
     suspend fun toggleTask(id: Long) = database.withTransaction {
         dao.toggleTask(id, System.currentTimeMillis())
-        if (dao.taskById(id)?.isCompleted == true) resolveReviews(id, true)
+        dao.taskById(id)?.let { task ->
+            if (task.isCompleted) resolveReviews(id, true)
+            createSummary(LocalDate.parse(task.day))
+        }
     }
 
     suspend fun deleteTask(id: Long) = dao.deleteTask(id)
@@ -142,7 +146,8 @@ class StudyRepository @Inject constructor(
                 subject = subject.take(60), mode = mode, targetMs = minutes * 60_000L,
                 state = "RUNNING",
                 startedWall = wall, lastWall = wall, lastElapsed = SystemClock.elapsedRealtime(),
-                blockedPackages = profile.blockedPackages, allowedPackages = profile.allowedPackages,
+                blockedPackages = (packageSet(profile.blockedPackages) - packageSet(profile.exemptPackages)).joinToString(","),
+                allowedPackages = profile.allowedPackages,
                 checkMinutes = profile.checkMinutes,
                 linkedTaskId = taskId?.takeIf { dao.taskById(it) != null },
             )
@@ -193,6 +198,7 @@ class StudyRepository @Inject constructor(
     suspend fun completeTask(taskId: Long) = database.withTransaction {
         dao.completeTask(taskId, System.currentTimeMillis())
         resolveReviews(taskId, true)
+        dao.taskById(taskId)?.let { createSummary(LocalDate.parse(it.day)) }
     }
 
     private suspend fun resolveReviews(taskId: Long, complete: Boolean) {
@@ -203,8 +209,7 @@ class StudyRepository @Inject constructor(
     suspend fun reviewTask(review: PendingTaskReview, complete: Boolean) = database.withTransaction {
         val pending = dao.pendingTaskReview().first()
         if (pending?.sessionId != review.sessionId || pending.taskId != review.taskId) return@withTransaction
-        if (complete) dao.completeTask(review.taskId, System.currentTimeMillis())
-        resolveReviews(review.taskId, complete)
+        if (complete) completeTask(review.taskId) else resolveReviews(review.taskId, false)
     }
 
     suspend fun finish(
@@ -232,6 +237,7 @@ class StudyRepository @Inject constructor(
             if (shouldCompleteTask && session.linkedTaskId != null) {
                 dao.completeTask(session.linkedTaskId, nowWall)
                 resolveReviews(session.linkedTaskId, true)
+                dao.taskById(session.linkedTaskId)?.let { createSummary(LocalDate.parse(it.day)) }
             } else if (finalKind == "COMPLETED" && session.linkedTaskId != null &&
                 dao.taskById(session.linkedTaskId)?.isCompleted == false) {
                 event(session.id, "TASK_REVIEW_PENDING", "本段学习达标，等待确认任务进度")
@@ -336,13 +342,13 @@ class StudyRepository @Inject constructor(
         }
     }
 
-    suspend fun createSummary(day: LocalDate) {
+    suspend fun createSummary(day: LocalDate) = database.withTransaction {
         val zone = ZoneId.systemDefault()
         val start = day.atStartOfDay(zone).toInstant().toEpochMilli()
         val end = day.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli()
         val segments = dao.segmentsForDay(day.toString())
         val events = dao.eventsBetween(start, end)
-        val tasks = dao.tasks().first().filter { it.day == day.toString() }
+        val tasks = dao.tasksOn(day.toString())
         val content = ai.summary(StudyEvidence(
             (segments.sumOf { it.durationMs } / 60_000).toInt(),
             events.count { it.kind == "DISTRACTION" },
@@ -362,7 +368,7 @@ class StudyRepository @Inject constructor(
                         id = it.id, goal = it.goal, subjects = it.subjects, examDay = it.examDay,
                         dailyMinutes = it.dailyMinutes, progressPercent = it.progressPercent,
                         checkMinutes = it.checkMinutes, blockedPackages = it.blockedPackages,
-                        allowedPackages = it.allowedPackages,
+                        allowedPackages = it.allowedPackages, exemptPackages = it.exemptPackages,
                     )
                 },
                 tasks = storedTasks.map {
@@ -393,13 +399,15 @@ class StudyRepository @Inject constructor(
         return StudyBackupCodec.encode(payload, System.currentTimeMillis(), appVersion)
     }
 
-    suspend fun restoreBackup(text: String): StudyBackupSummary = mutex.withLock {
+    suspend fun restoreBackup(text: String): StudyBackupSummary = restoreBackup(StudyBackupCodec.decode(text))
+
+    suspend fun restoreBackup(verified: StudyBackupPayload): StudyBackupSummary = mutex.withLock {
         require(!runtime.serviceAlive && runtime.current.value == null) {
             "请先结束当前学习，再恢复备份"
         }
         require(dao.currentSession() == null) { "请先结束现有学习会话，再恢复备份" }
         val payload = StudyBackupCodec.normalizeForRestore(
-            StudyBackupCodec.decode(text), System.currentTimeMillis(),
+            verified, System.currentTimeMillis(),
         )
         database.withTransaction {
             dao.deleteAllEvents()
@@ -434,6 +442,7 @@ class StudyRepository @Inject constructor(
         dailyMinutes = dailyMinutes, progressPercent = progressPercent,
         checkMinutes = checkMinutes, blockedPackages = blockedPackages,
         allowedPackages = allowedPackages,
+        exemptPackages = exemptPackages,
     )
 
     private fun BackupTask.toEntity() = StudyTask(
